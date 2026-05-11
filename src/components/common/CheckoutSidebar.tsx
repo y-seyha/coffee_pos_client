@@ -1,19 +1,30 @@
 const CartItem = () => (
-  <div className="flex items-center gap-4 bg-white p-3 rounded-2xl shadow-sm border border-gray-50">
-    <div className="w-16 h-16 bg-[#f9f9f9] rounded-xl overflow-hidden">
-      <img src="/iced-coffee.png" className="w-full h-full object-cover" />
+  <div className="flex items-center gap-4 bg-white p-4 rounded-[24px] shadow-sm border border-gray-100 hover:shadow-md transition-all">
+    {/* Product Image */}
+    <div className="w-20 h-20 bg-[#f8f8f8] rounded-[18px] overflow-hidden flex items-center justify-center shrink-0">
+      <img src="/coffee_cup.png" className="w-[72%] h-[72%] object-contain" />
     </div>
-    <div className="flex-1">
-      <h4 className="text-sm font-medium">អាយអាយស្កូកាណូ</h4>
-      <p className="text-xs text-gray-400">Iced Americano</p>
-      <div className="flex justify-between items-center mt-1">
-        <span className="text-[#cd8c52] font-bold text-sm">3.00$</span>
-        <div className="flex items-center gap-2">
-          <button className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500">
+
+    {/* Product Info */}
+    <div className="flex-1 min-w-0">
+      <h4 className="text-[15px] font-semibold text-black truncate">
+        អាយអាយស្កូកាណូ
+      </h4>
+
+      <p className="text-sm text-gray-400 truncate">Iced Americano</p>
+
+      <div className="flex justify-between items-center mt-3">
+        <span className="text-[#cd8c52] font-bold text-[16px]">3.00$</span>
+
+        {/* Quantity Controls */}
+        <div className="flex items-center gap-3">
+          <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition">
             -
           </button>
-          <span className="text-sm font-bold">3</span>
-          <button className="w-6 h-6 rounded-full border border-gray-200 flex items-center justify-center text-gray-500">
+
+          <span className="text-sm font-bold text-black">3</span>
+
+          <button className="w-8 h-8 rounded-full border border-gray-200 flex items-center justify-center text-gray-500 hover:bg-gray-50 transition">
             +
           </button>
         </div>
@@ -25,7 +36,7 @@ const CartItem = () => (
 const CheckoutSidebar = () => {
   return (
     <aside className="w-full lg:w-[400px] bg-white h-full border-l border-gray-100 p-6 lg:p-8 flex flex-col">
-      <h2 className="text-2xl font-bold text-[#cd8c52] font-khmer text-center mb-8">
+      <h2 className="text-2xl font-bold text-[#d18b47] font-khmer text-center mb-8">
         ការទូទាត់ប្រាក់
       </h2>
 

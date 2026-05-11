@@ -4,20 +4,22 @@ import CategoryBar from "../common/CategoryBar";
 
 interface ShopLayoutProps {
   children: React.ReactNode;
+  onSearch?: (query: string) => void;
+  onCategory?: (id: string | number) => void;
 }
 
-export default function ShopLayout({ children }: ShopLayoutProps) {
+export default function ShopLayout({
+  children,
+  onSearch,
+  onCategory,
+}: ShopLayoutProps) {
   return (
     <div className="min-h-screen bg-[#fafafa] flex flex-col font-sans">
-      <Navbar />
+      <Navbar onSearch={onSearch} />
 
       <div className="flex flex-1 overflow-hidden">
-        {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto px-8">
-          <div className="max-w-[1200px] mx-auto">
-            <CategoryBar />
-          </div>
-
+          <CategoryBar onSelect={onCategory} />
           <div className="pb-10 pt-4 max-w-[1200px] mx-auto">{children}</div>
         </div>
 

@@ -1,6 +1,28 @@
+"use client";
+
+import { useState } from "react";
 import { Search } from "lucide-react";
 
-const Navbar = () => {
+type NavbarProps = {
+  onSearch?: (query: string) => void;
+};
+
+const Navbar = ({ onSearch }: NavbarProps) => {
+  const [query, setQuery] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const handleSearch = async () => {
+    const trimmed = query.trim();
+    if (!trimmed) return;
+
+    try {
+      setLoading(true);
+      await onSearch?.(trimmed);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <nav className="flex items-center justify-between px-6 lg:px-8 py-4 bg-white border-b border-gray-100">
       {/* Branding */}
@@ -9,25 +31,34 @@ const Navbar = () => {
           <div className="w-[2px] h-3 bg-white rotate-45 rounded-full"></div>
         </div>
         <span className="font-bold text-lg tracking-wider text-[#43281c]">
-          404' CAFE.
+          404&apos; CAFE.
         </span>
       </div>
 
-      {/* Search Bar */}
+      {/* Search */}
       <div className="relative w-full max-w-md">
         <input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
           type="text"
-          placeholder="ស្វែងរកភេសជ្ជៈ ឬ អាហារសម្រន់ផ្សេងៗ..."
-          className="w-full text-black bg-[#fdf6ee] border border-[#e8d5c4] rounded-full py-2 px-6 pr-12 focus:outline-none focus:ring-2 focus:ring-[#cd8c52]/20 font-khmer text-sm"
+          placeholder="ស្វែងរកភេសជ្ជៈ..."
+          className="w-full text-black bg-[#fdf6ee] border border-[#e8d5c4] rounded-full py-2 px-6 pr-12 focus:outline-none focus:ring-2 focus:ring-[#cd8c52]/20"
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
         />
-        <button className="absolute right-1 top-1 bottom-1 px-4 bg-[#D5904B] text-white rounded-full flex items-center gap-1 hover:bg-[#b57a46] transition-colors">
+
+        <button
+          onClick={handleSearch}
+          disabled={loading}
+          className="absolute right-1 top-1 bottom-1 px-4 bg-[#D5904B] text-white rounded-full flex items-center gap-1 hover:bg-[#b57a46] transition disabled:opacity-60 cursor-pointer"
+        >
           <Search size={16} />
-          <span className="text-xs font-khmer">ស្វែងរក</span>
+          <span className="text-xs font-khmer">
+            {loading ? "..." : "ស្វែងរក"}
+          </span>
         </button>
       </div>
 
-      {/* Empty space for balance or User Profile */}
-      <div className="w-32 hidden md:block"></div>
+      <div className="w-32 hidden md:block" />
     </nav>
   );
 };
