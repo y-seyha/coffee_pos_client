@@ -2,9 +2,15 @@
 
 import Head from "next/head";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
+
+import { useAuth } from "@/context/AuthContext";
+import { useState } from "react";
+import { Eye, EyeOff } from "lucide-react";
 
 const loginSchema = z.object({
   email: z
@@ -23,6 +29,13 @@ const loginSchema = z.object({
 type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
+  const router = useRouter();
+
+  const { login } = useAuth();
+
+  const [serverError, setServerError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
@@ -33,7 +46,21 @@ const LoginPage = () => {
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    console.log(data);
+    try {
+      setServerError("");
+
+      await login({
+        email: data.email,
+        password: data.password,
+      });
+
+      router.push("/");
+    } catch (error: any) {
+      setServerError(
+        // error?.response?.data?.message || error?.message ||
+        "Incorrect email or password",
+      );
+    }
   };
 
   return (
@@ -69,10 +96,18 @@ const LoginPage = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-6 w-full md:max-w-[400px]"
           >
+            {/* SERVER ERROR */}
+            {serverError && (
+              <div className="bg-red-100 border border-red-300 text-red-700 px-5 py-3 rounded-2xl text-sm font-medium">
+                {serverError}
+              </div>
+            )}
+
             <div className="space-y-2">
               <label className="block text-[13px] font-bold text-[#a47e5e] ml-6">
                 ឈ្មោះអ្នកប្រើប្រាស់ ឬ អ៊ីមែល
               </label>
+
               <input
                 type="email"
                 placeholder="example@gmail.com"
@@ -84,6 +119,7 @@ const LoginPage = () => {
                     : "border-[#813800] focus:ring-[#813800]/20"
                 }`}
               />
+
               {errors.email && (
                 <p className="text-red-500 text-sm ml-6 font-medium">
                   {errors.email.message}
@@ -96,6 +132,7 @@ const LoginPage = () => {
                 <label className="text-[13px] font-bold text-[#a47e5e]">
                   លេខសម្ងាត់
                 </label>
+
                 <a
                   href="#"
                   className="text-[13px] font-bold text-[#cd8c52] hover:opacity-80 transition-opacity"
@@ -103,17 +140,29 @@ const LoginPage = () => {
                   ភ្លេចលេខសម្ងាត់?
                 </a>
               </div>
-              <input
-                type="password"
-                placeholder="........"
-                autoComplete="current-password"
-                {...register("password")}
-                className={`w-full h-12 px-7 rounded-full border-2 bg-[#f1e0ca] focus:outline-none focus:ring-2 transition-all placeholder:text-[#a47e5e]/40 text-[#43281c] ${
-                  errors.password
-                    ? "border-red-500 focus:ring-red-300"
-                    : "border-[#813800] focus:ring-[#813800]/20"
-                }`}
-              />
+
+              <div className="relative">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  placeholder="........"
+                  autoComplete="current-password"
+                  {...register("password")}
+                  className={`w-full h-12 px-7 pr-14 rounded-full border-2 bg-[#f1e0ca] focus:outline-none focus:ring-2 transition-all placeholder:text-[#a47e5e]/40 text-[#43281c] ${
+                    errors.password
+                      ? "border-red-500 focus:ring-red-300"
+                      : "border-[#813800] focus:ring-[#813800]/20"
+                  }`}
+                />
+
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-5 top-1/2 -translate-y-1/2 text-[#a47e5e] hover:text-[#43281c] transition-colors"
+                >
+                  {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                </button>
+              </div>
+
               {errors.password && (
                 <p className="text-red-500 text-sm ml-6 font-medium">
                   {errors.password.message}
