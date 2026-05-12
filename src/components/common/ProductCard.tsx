@@ -2,9 +2,10 @@ interface ProductCardProps {
   name: string;
   price: string;
   image: string;
+  onOrder?: () => void;
 }
 
-const ProductCard = ({ name, price, image }: ProductCardProps) => {
+const ProductCard = ({ name, price, image, onOrder }: ProductCardProps) => {
   return (
     <div className="bg-[#fcfcfc] p-4 rounded-[30px] border border-[#f1f1f1] hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
       {/* Image Box */}
@@ -26,7 +27,10 @@ const ProductCard = ({ name, price, image }: ProductCardProps) => {
       </div>
 
       {/* Button */}
-      <button className="w-full mt-6 py-3 rounded-full bg-[#d18b47] text-white text-sm font-khmer hover:opacity-90 transition">
+      <button
+        onClick={onOrder}
+        className="w-full mt-6 py-3 rounded-full cursor-pointer bg-[#d18b47] text-white font-khmer hover:opacity-90 transition"
+      >
         កម្មង់
       </button>
     </div>

@@ -18,13 +18,22 @@ export default function ShopLayout({
       <Navbar onSearch={onSearch} />
 
       <div className="flex flex-1 overflow-hidden">
-        <div className="flex-1 overflow-y-auto px-8">
-          <CategoryBar onSelect={onCategory} />
-          <div className="pb-10 pt-4 max-w-[1200px] mx-auto">{children}</div>
-        </div>
+        {/* Main Content */}
+        <main className="flex-1 overflow-y-auto px-4 sm:px-6 lg:px-8">
+          <div className="max-w-[1200px] mx-auto py-4 space-y-6">
+            {/* Category */}
+            <CategoryBar onSelect={onCategory} />
 
-        <aside className="hidden lg:block h-[calc(100vh-80px)] sticky top-0 border-l border-gray-100">
-          <CheckoutSidebar />
+            {/* Products / Children */}
+            <div className="pb-10">{children}</div>
+          </div>
+        </main>
+
+        {/* Sidebar */}
+        <aside className="hidden lg:block w-[380px] border-l border-gray-100 bg-white">
+          <div className="sticky top-0 h-screen">
+            <CheckoutSidebar />
+          </div>
         </aside>
       </div>
     </div>
