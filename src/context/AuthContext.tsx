@@ -1,222 +1,139 @@
 "use client";
 
-import { apiService } from "@/helper/crud.helper";
 import {
   createContext,
   useContext,
   useEffect,
-  useMemo,
   useState,
   ReactNode,
 } from "react";
 
-type Role = "admin" | "user";
+import { apiRequest } from "@/helper/api.helper";
+import { User } from "@/types";
+import {toast} from "sonner";
+import {successToast} from "@/components/ui/successToast";
 
-interface User {
-  id: number;
-  name: string;
-  email: string;
-  role: Role;
-}
-
-interface LoginPayload {
-  email: string;
-  password: string;
-}
-
-interface RegisterPayload {
-  name: string;
-  email: string;
-  password: string;
-  role?: Role;
-}
-
-interface AuthResponse {
-  message: string;
-  token: string;
-  user: User;
-}
-
-interface RegisterResponse {
-  message: string;
-  user: User;
-}
-
-interface AuthContextType {
+type AuthContextType = {
   user: User | null;
-  token: string | null;
   loading: boolean;
   isAuthenticated: boolean;
-
-  login: (payload: LoginPayload) => Promise<User>;
-  register: (payload: RegisterPayload) => Promise<void>;
+  login: (data: { email: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
-}
+  fetchMe: () => Promise<void>;
+};
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const TOKEN_KEY = "token";
-const USER_KEY = "user";
-
-const saveAuth = (token: string, user: User) => {
-  localStorage.setItem(TOKEN_KEY, token);
-  localStorage.setItem(USER_KEY, JSON.stringify(user));
-
-  const expires = new Date(Date.now() + 2 * 60 * 60 * 1000).toUTCString();
-
-  document.cookie =
-    `token=${token}; ` + `expires=${expires}; ` + `path=/; ` + `SameSite=Lax`;
-};
-
-const clearAuth = () => {
-  localStorage.removeItem(TOKEN_KEY);
-  localStorage.removeItem(USER_KEY);
-
-  document.cookie = "token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 GMT";
-};
-const getStoredUser = (): User | null => {
-  if (typeof window === "undefined") return null;
-
-  const storedUser = localStorage.getItem(USER_KEY);
-
-  return storedUser ? JSON.parse(storedUser) : null;
-};
-
-const getStoredToken = (): string | null => {
-  if (typeof window === "undefined") return null;
-
-  return localStorage.getItem(TOKEN_KEY);
-};
-
-const validateEmail = (email: string) => {
-  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
-};
-
-const validatePassword = (password: string) => {
-  return password.length >= 6;
-};
-
-const validateName = (name: string) => {
-  return name.trim().length >= 2;
-};
-
-interface AuthProviderProps {
-  children: ReactNode;
-}
-
-export const AuthProvider = ({ children }: AuthProviderProps) => {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-
-  const [token, setToken] = useState<string | null>(null);
-
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const storedUser = getStoredUser();
-    const storedToken = getStoredToken();
+  const isAuthenticated = !!user;
 
-    if (storedUser && storedToken) {
-      setUser(storedUser);
-      setToken(storedToken);
-    }
-
-    setLoading(false);
-  }, []);
-
-  const login = async ({ email, password }: LoginPayload): Promise<User> => {
-    // validation
-    if (!validateEmail(email)) {
-      throw new Error("Invalid email");
-    }
-
-    if (!password.trim()) {
-      throw new Error("Password is required");
-    }
+  const fetchMe = async () => {
+    setLoading(true);
 
     try {
-      const data = await apiService.post<AuthResponse, LoginPayload>("/login", {
-        email,
-        password,
-      });
+      const res = await apiRequest<{ user: User }>("get", "/auth/me");
 
-      if (!data.token || !data.user) {
-        throw new Error("Invalid server response");
+      if (res?.user) {
+        setUser(res.user);
+      } else {
+        setUser(null);
       }
+    } catch (err: any) {
+      setUser(null);
 
-      saveAuth(data.token, data.user);
-      console.log(data.token, "Token");
-      console.log(data.user, "User");
-
-    
-      setUser(data.user);
-      setToken(data.token);
-
-      return data.user;
-    } catch (error: any) {
-      const message =
-        error?.response?.data?.message || error?.message || "Login failed";
-
-      throw new Error(message);
-    }
-  };
-
-  const register = async ({
-    name,
-    email,
-    password,
-    role = "user",
-  }: RegisterPayload): Promise<void> => {
-    if (!validateName(name)) {
-      throw new Error("Name must be at least 2 characters");
-    }
-
-    if (!validateEmail(email)) {
-      throw new Error("Invalid email");
-    }
-
-    if (!validatePassword(password)) {
-      throw new Error("Password must be at least 6 characters");
-    }
-
-    await apiService.post<RegisterResponse, RegisterPayload>("/register", {
-      name,
-      email,
-      password,
-      role,
-    });
-  };
-
-  const logout = async (): Promise<void> => {
-    try {
-      await apiService.post("/logout");
-    } catch (error) {
-      console.error(error);
+      if (err?.status !== 401) {
+        console.error("fetchMe error:", err);
+        toast.error("Failed to load user session");
+      }
     } finally {
-      clearAuth();
+      setLoading(false);
+    }
+  };
+
+  const login = async (data: { email: string; password: string }) => {
+    setLoading(true);
+
+    const loadingToast = toast.loading("Logging in...");
+
+    try {
+      await apiRequest("post", "/auth/login", data);
+
+      await fetchMe();
+
+      toast.dismiss(loadingToast);
+
+      successToast("Login successful", "Welcome back ", 5000);
+    } catch (err) {
+      toast.dismiss(loadingToast);
+
+      toast.error("Invalid email or password");
+
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const logout = async () => {
+    setLoading(true);
+
+    const loadingToast = toast.loading("Logging out...");
+
+    try {
+      await apiRequest("post", "/auth/logout");
+
+      toast.success("Logged out");
+    } catch (err) {
+      console.error("Logout API failed:", err);
+      toast.error("Logout failed");
+    } finally {
+      toast.dismiss(loadingToast);
 
       setUser(null);
-      setToken(null);
+      setLoading(false);
+
+      window.location.href = "/auth/login";
     }
   };
 
-  const value = useMemo<AuthContextType>(
-    () => ({
-      user,
-      token,
-      loading,
-      isAuthenticated: !!token,
+  useEffect(() => {
+    const initAuth = async () => {
+      try {
+        if (window.location.pathname !== "/auth/login") {
+          await fetchMe();
+        } else {
+          setLoading(false);
+        }
+      } catch (err) {
+        console.error("Auth init error:", err);
+        toast.error("Auth initialization failed");
+        setLoading(false);
+      }
+    };
 
-      login,
-      register,
-      logout,
-    }),
-    [user, token, loading],
+    initAuth();
+  }, []);
+
+  return (
+      <AuthContext.Provider
+          value={{
+            user,
+            loading,
+            isAuthenticated,
+            login,
+            logout,
+            fetchMe,
+          }}
+      >
+        {children}
+      </AuthContext.Provider>
   );
+}
 
-  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-};
-
-export const useAuth = (): AuthContextType => {
+export function useAuth() {
   const context = useContext(AuthContext);
 
   if (!context) {
@@ -224,4 +141,4 @@ export const useAuth = (): AuthContextType => {
   }
 
   return context;
-};
+}

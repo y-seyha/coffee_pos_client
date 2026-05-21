@@ -1,124 +1,216 @@
 "use client";
 
-import React, { createContext, useContext, useEffect, useState } from "react";
+import React, {
+  createContext,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 
-export type CartItem = {
-  id: string;
-  productId: number;
+import { apiRequest } from "@/helper/api.helper";
+import { CartItem, CartResponse, CartSummary, CheckoutApiResponse } from "@/types";
 
-  name: string;
-  image: string;
-  price: number;
-
-  quantity: number;
-
-  options: {
-    ice: "less" | "normal";
-    sugar: "0" | "25" | "50" | "75" | "100";
-    size: "S" | "M" | "L";
-  };
+type CheckoutInfo = {
+  order_type: "DINEIN" | "TAKEAWAY";
+  table_id?: number;
+  notes?: string;
 };
 
 type CartContextType = {
   items: CartItem[];
+  summary: CartSummary | null;
+  loading: boolean;
 
-  addToCart: (item: Omit<CartItem, "id" | "quantity">) => void;
-  removeFromCart: (id: string) => void;
+  refreshCart: () => Promise<void>;
 
-  increaseQty: (id: string) => void;
-  decreaseQty: (id: string) => void;
+  addToCart: (payload: {
+    product_id: number;
+    quantity: number;
+    variants?: {
+      variant_group_id: number;
+      variant_option_id: number;
+    }[];
+  }) => Promise<void>;
 
-  clearCart: () => void;
+  updateQuantity: (itemId: number, quantity: number) => Promise<void>;
+  increaseQty: (itemId: number) => Promise<void>;
+  decreaseQty: (itemId: number) => Promise<void>;
+  removeItem: (itemId: number) => Promise<void>;
+  clearCart: () => Promise<void>;
+
+  checkout: (payment_method: "CASH" | "KHQR") => Promise<CheckoutApiResponse>;
 
   getTotalPrice: () => number;
   getTotalItems: () => number;
+
+  checkoutInfo: CheckoutInfo | null;
+  setCheckoutInfo: (data: CheckoutInfo | null) => void;
 };
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
-const STORAGE_KEY = "cart_items";
-
-export const CartProvider = ({ children }: { children: React.ReactNode }) => {
+export const CartProvider = ({
+                               children,
+                             }: {
+  children: React.ReactNode;
+}) => {
   const [items, setItems] = useState<CartItem[]>([]);
+  const [summary, setSummary] = useState<CartSummary | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [checkoutInfo, setCheckoutInfo] = useState<CheckoutInfo | null>(null);
 
-  useEffect(() => {
-    const stored = localStorage.getItem(STORAGE_KEY);
-    if (stored) {
-      setItems(JSON.parse(stored));
+  const refreshCart = async () => {
+    setLoading(true);
+    try {
+      const res = await apiRequest<CartResponse>("get", "/cart");
+
+      setItems(res.cart.items);
+      setSummary(res.summary);
+    } catch (err) {
+      console.error("refreshCart failed:", err);
+    } finally {
+      setLoading(false);
     }
-  }, []);
+  };
 
-  useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
-  }, [items]);
+  const addToCart = async (payload: {
+    product_id: number;
+    quantity: number;
+    variants?: {
+      variant_group_id: number;
+      variant_option_id: number;
+    }[];
+  }) => {
+    try {
+      await apiRequest("post", "/cart/addToCart", {
+        product_id: Number(payload.product_id),
+        quantity: Number(payload.quantity),
+        variants: payload.variants ?? [],
+      });
 
-  const addToCart = (item: Omit<CartItem, "id" | "quantity">) => {
-    const id =
-      item.productId +
-      "-" +
-      item.options.size +
-      "-" +
-      item.options.ice +
-      "-" +
-      item.options.sugar;
+      await refreshCart();
+    } catch (err) {
+      console.error("addToCart failed:", err);
+    }
+  };
 
-    setItems((prev) => {
-      const existing = prev.find((i) => i.id === id);
+  const updateQuantity = async (itemId: number, quantity: number) => {
+    try {
+      await apiRequest("patch", `/cart/items/${itemId}`, {
+        quantity,
+      });
 
-      if (existing) {
-        return prev.map((i) =>
-          i.id === id ? { ...i, quantity: i.quantity + 1 } : i,
-        );
+      await refreshCart();
+    } catch (err) {
+      console.error("updateQuantity failed:", err);
+    }
+  };
+
+  const increaseQty = async (itemId: number) => {
+    try {
+      await apiRequest("patch", `/cart/items/${itemId}/increase`);
+      await refreshCart();
+    } catch (err) {
+      console.error("increaseQty failed:", err);
+    }
+  };
+
+  const decreaseQty = async (itemId: number) => {
+    try {
+      await apiRequest("patch", `/cart/items/${itemId}/decrease`);
+      await refreshCart();
+    } catch (err) {
+      console.error("decreaseQty failed:", err);
+    }
+  };
+
+  const removeItem = async (itemId: number) => {
+    try {
+      await apiRequest("delete", `/cart/items/${itemId}`);
+      await refreshCart();
+    } catch (err) {
+      console.error("removeItem failed:", err);
+    }
+  };
+
+  const clearCart = async () => {
+    try {
+      await apiRequest("delete", "/cart/clear");
+      await refreshCart();
+    } catch (err) {
+      console.error("clearCart failed:", err);
+    }
+  };
+
+  const checkout = async (
+      payment_method: "CASH" | "KHQR"
+  ): Promise<CheckoutApiResponse> => {
+    try {
+      if (!checkoutInfo) {
+        throw new Error("Missing checkout info (order_type, table_id, notes)");
       }
 
-      return [...prev, { ...item, id, quantity: 1 }];
-    });
-  };
+      const payload = {
+        ...checkoutInfo,
+        payment_method,
+      };
 
-  const removeFromCart = (id: string) => {
-    setItems((prev) => prev.filter((i) => i.id !== id));
-  };
+      const res = await apiRequest<CheckoutApiResponse>(
+          "post",
+          "/cart/checkout",
+          payload
+      );
 
-  const increaseQty = (id: string) => {
-    setItems((prev) =>
-      prev.map((i) => (i.id === id ? { ...i, quantity: i.quantity + 1 } : i)),
-    );
-  };
+      await refreshCart();
+      setCheckoutInfo(null);
 
-  const decreaseQty = (id: string) => {
-    setItems((prev) =>
-      prev
-        .map((i) => (i.id === id ? { ...i, quantity: i.quantity - 1 } : i))
-        .filter((i) => i.quantity > 0),
-    );
+      return res;
+    } catch (err) {
+      console.error("checkout failed:", err);
+      throw err;
+    }
   };
-  const clearCart = () => setItems([]);
 
   const getTotalPrice = () => {
-    return items.reduce((sum, item) => {
-      return sum + item.price * item.quantity;
-    }, 0);
+    return summary?.grand_total ?? 0;
   };
 
   const getTotalItems = () => {
-    return items.reduce((sum, item) => sum + item.quantity, 0);
+    return summary?.quantity_total ?? 0;
   };
 
+  useEffect(() => {
+    refreshCart();
+  }, []);
+
   return (
-    <CartContext.Provider
-      value={{
-        items,
-        addToCart,
-        removeFromCart,
-        increaseQty,
-        decreaseQty,
-        clearCart,
-        getTotalPrice,
-        getTotalItems,
-      }}
-    >
-      {children}
-    </CartContext.Provider>
+      <CartContext.Provider
+          value={{
+            items,
+            summary,
+            loading,
+
+            refreshCart,
+
+            addToCart,
+            updateQuantity,
+            increaseQty,
+            decreaseQty,
+
+            removeItem,
+            clearCart,
+
+            checkout,
+
+            getTotalPrice,
+            getTotalItems,
+
+            setCheckoutInfo,
+            checkoutInfo,
+          }}
+      >
+        {children}
+      </CartContext.Provider>
   );
 };
 

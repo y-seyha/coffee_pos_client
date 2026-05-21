@@ -1,15 +1,7 @@
 "use client";
 
 import { useState } from "react";
-
-export const CATEGORIES = [
-  { id: "all", name: "ទាំងអស់" },
-  { id: 1, name: "លក់ដាច់បំផុត" },
-  { id: 2, name: "ប្រភេទកាហ្វេ" },
-  { id: 3, name: "ប្រភេទត្រជាក់" },
-  { id: 4, name: "ប្រភេទក្តៅៗ" },
-  { id: 5, name: "ប្រភេទអាហារសម្រន់" },
-];
+import {CATEGORIES} from "@/helper";
 
 interface Props {
   onSelect?: (categoryId: string | number) => void;

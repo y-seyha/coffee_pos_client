@@ -1,0 +1,282 @@
+
+import { Trash2 } from "lucide-react";
+import { useState } from "react";
+import PaymentSelectionModal from "../payment/PaymentSelectionModal";
+import SuccessModal from "../payment/PaymentSuccessModal";
+import QRPaymentModal from "../payment/QRPaymentModal";
+import {useCart} from "@/context/CartContext";
+import {CheckoutApiResponse} from "@/types";
+import CheckoutInfoModal from "@/components/client/modal/CheckoutInfoModal";
+
+
+const CartItem = ({ item }: any) => {
+    const { increaseQty, decreaseQty, removeItem } = useCart();
+
+    return (
+        <div className="flex gap-4 bg-white p-4 rounded-2xl border border-gray-100 shadow-sm hover:shadow-md transition-all">
+
+            <div className="w-20 h-20 bg-gray-50 rounded-2xl flex items-center justify-center shrink-0 border">
+                <img
+                    src={item.product?.image || item.image}
+                    className="w-[70%] h-[70%] object-contain"
+                />
+            </div>
+
+            <div className="flex-1 min-w-0 flex flex-col justify-between">
+
+                <div>
+                    <h4 className="text-[15px] font-bold text-gray-900 truncate">
+                        {item.product?.name || "Unknown"}
+                    </h4>
+
+                    <div className="flex flex-wrap gap-1 mt-1">
+                        {item.variants?.length ? (
+                            item.variants.map((v: any, i: number) => (
+                                <span
+                                    key={i}
+                                    className="text-[11px] px-2 py-[2px] rounded-full bg-gray-100 text-gray-600"
+                                >
+                  {v.group}: {v.option}
+                </span>
+                            ))
+                        ) : (
+                            <span className="text-xs text-gray-400">No options</span>
+                        )}
+                    </div>
+                </div>
+
+                <div className="flex items-end justify-between mt-3">
+
+                    <div className="flex flex-col">
+            <span className="text-[#cd8c52] font-bold text-[15px]">
+              ${item.total_price.toFixed(2)}
+            </span>
+                        <span className="text-[11px] text-gray-400">
+              ${item.unit_price?.toFixed?.(2) ?? "0.00"} / item
+            </span>
+                    </div>
+
+                    <div className="flex items-center bg-[#F7F1EA] rounded-full px-2 py-1 gap-2 border border-[#E6D5C5]">
+
+                        <button
+                            onClick={() => decreaseQty(item.id)}
+                            disabled={item.quantity <= 1}
+                            className={`w-7 h-7 rounded-full flex items-center justify-center ${
+                                item.quantity <= 1
+                                    ? "text-gray-300 cursor-not-allowed"
+                                    : "text-[#8B5E3C]"
+                            }`}
+                        >
+                            -
+                        </button>
+
+                        <span className="text-sm font-semibold w-6 text-center text-[#5A3E2B]">
+              {item.quantity}
+            </span>
+
+                        <button
+                            onClick={() => increaseQty(item.id)}
+                            className="w-7 h-7 rounded-full flex items-center justify-center text-[#8B5E3C]"
+                        >
+                            +
+                        </button>
+
+                    </div>
+                </div>
+
+                <button
+                    onClick={() => removeItem(item.id)}
+                    className="mt-2 text-xs text-red-400 hover:text-red-600 flex items-center gap-1 w-fit"
+                >
+                    <Trash2 size={14} />
+                    Remove
+                </button>
+
+            </div>
+        </div>
+    );
+};
+
+const CheckoutSidebar = () => {
+    const {
+        items,
+        clearCart,
+        summary,
+        checkout,
+    } = useCart();
+
+    const [showClearModal, setShowClearModal] = useState(false);
+    const [showCheckoutInfo, setShowCheckoutInfo] = useState(false);
+    const [showPaymentModal, setShowPaymentModal] = useState(false);
+    const [showQRModal, setShowQRModal] = useState(false);
+    const [showSuccessModal, setShowSuccessModal] = useState(false);
+
+    const [completedOrder, setCompletedOrder] =
+        useState<CheckoutApiResponse | null>(null);
+
+    const handleSelectPayment = async (type: "KHQR" | "CASH") => {
+        try {
+            const order = await checkout(type);
+
+            if (!order) return;
+
+            setCompletedOrder(order);
+
+            setShowPaymentModal(false);
+
+            if (type === "KHQR") {
+                setShowQRModal(true);
+            } else {
+                setShowSuccessModal(true);
+            }
+        } catch (err) {
+            console.error("Checkout failed:", err);
+        }
+    };
+    const handleQRSuccess = () => {
+        setShowQRModal(false);
+        setShowSuccessModal(true);
+    };
+
+    return (
+        <aside className="w-full lg:w-[400px] bg-white h-full border-l border-gray-100 p-6 lg:p-8 flex flex-col">
+
+            {/* HEADER */}
+            <div className="mb-6">
+                <h2 className="text-2xl font-bold text-[#d18b47] font-khmer text-center">
+                    ការទូទាត់ប្រាក់
+                </h2>
+
+                <div className="mt-3 text-center text-xs text-gray-400">
+                    <p>Quantity: {summary?.quantity_total ?? 0}</p>
+                </div>
+            </div>
+
+            {/* CART ITEMS */}
+            <div className="flex-1 space-y-4 overflow-y-auto pr-2">
+                {items.length === 0 ? (
+                    <p className="text-center text-gray-400 mt-10">
+                        No items in cart
+                    </p>
+                ) : (
+                    items.map((item) => <CartItem key={item.id} item={item} />)
+                )}
+            </div>
+
+            {/* SUMMARY */}
+            <div className="mt-6 p-4 rounded-2xl border bg-gray-50 space-y-3">
+
+                <div className="flex justify-between text-sm text-gray-500">
+                    <span>Subtotal</span>
+                    <span>${summary?.subtotal?.toFixed(2) ?? "0.00"}</span>
+                </div>
+
+                <div className="flex justify-between text-sm text-red-400">
+                    <span>Discount</span>
+                    <span>- ${summary?.discount_total?.toFixed(2) ?? "0.00"}</span>
+                </div>
+
+                <div className="flex justify-between text-sm text-gray-500">
+                    <span>Tax</span>
+                    <span>${summary?.tax?.toFixed(2) ?? "0.00"}</span>
+                </div>
+
+                <div className="flex justify-between font-bold text-lg text-[#cd8c52] border-t pt-2">
+                    <span>Total</span>
+                    <span>${summary?.grand_total?.toFixed(2) ?? "0.00"}</span>
+                </div>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="flex gap-2 mt-5">
+
+                <button
+                    onClick={() => setShowClearModal(true)}
+                    className="w-1/3 py-3 border rounded-2xl text-gray-500"
+                >
+                    លុបចេញ
+                </button>
+
+                <button
+                    onClick={() => setShowCheckoutInfo(true)}
+                    disabled={items.length === 0}
+                    className="w-2/3 py-4 bg-[#7487ff] text-white rounded-2xl font-bold disabled:opacity-50"
+                >
+                    ទូទាត់
+                </button>
+
+            </div>
+
+            {/* MODALS */}
+
+            {showClearModal && (
+                <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+                    <div className="bg-white w-[320px] rounded-2xl p-6">
+
+                        <h3 className="text-lg font-bold text-center">
+                            Clear cart?
+                        </h3>
+
+                        <div className="flex gap-3 mt-6">
+
+                            <button
+                                onClick={() => setShowClearModal(false)}
+                                className="flex-1 py-2 border rounded-xl"
+                            >
+                                Cancel
+                            </button>
+
+                            <button
+                                onClick={() => {
+                                    clearCart();
+                                    setShowClearModal(false);
+                                }}
+                                className="flex-1 py-2 bg-red-500 text-white rounded-xl"
+                            >
+                                Clear
+                            </button>
+
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            {showCheckoutInfo && (
+                <CheckoutInfoModal
+                    onClose={() => setShowCheckoutInfo(false)}
+                    onNext={() => {
+                        setShowCheckoutInfo(false);
+                        setShowPaymentModal(true);
+                    }}
+                />
+            )}
+
+            {showPaymentModal && (
+                <PaymentSelectionModal
+                    onClose={() => setShowPaymentModal(false)}
+                    onSelectPayment={handleSelectPayment}
+                />
+            )}
+
+            {showQRModal && (
+                <QRPaymentModal
+                    onClose={() => setShowQRModal(false)}
+                    onPaymentSuccess={handleQRSuccess}
+                />
+            )}
+
+            {showSuccessModal && completedOrder && (
+                <SuccessModal
+                    order={completedOrder.order}
+                    onClose={() => {
+                        setShowSuccessModal(false);
+                        clearCart();
+                    }}
+                />
+            )}
+
+        </aside>
+    );
+};
+
+export default CheckoutSidebar;

@@ -2,7 +2,7 @@ import { X } from "lucide-react";
 
 interface PaymentSelectionModalProps {
   onClose: () => void;
-  onSelectPayment: (type: "QR" | "CASH") => void;
+  onSelectPayment: (type: "KHQR" | "CASH") => void;
 }
 
 const PaymentSelectionModal = ({
@@ -28,7 +28,7 @@ const PaymentSelectionModal = ({
         {/* Buttons Grid */}
         <div className="flex gap-4 items-stretch h-18 mb-5 ">
           <button
-            onClick={() => onSelectPayment("QR")}
+              onClick={() => onSelectPayment("KHQR")}
             className="flex-1 bg-[#FFD700] hover:bg-[#ffcf00] text-black font-khmer text-xl cursor-pointer rounded-2xl shadow-lg transition-transform active:scale-95 flex items-center justify-center text-center p-4 leading-relaxed"
           >
             ទូទាត់តាមQR

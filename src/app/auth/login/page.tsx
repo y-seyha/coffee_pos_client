@@ -5,45 +5,29 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 import { useForm } from "react-hook-form";
-import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 
 import { useAuth } from "@/context/AuthContext";
-import { useState } from "react";
+import {useEffect, useState} from "react";
 import { Eye, EyeOff } from "lucide-react";
+import {LoginFormData, loginSchema} from "@/helper";
 
-const loginSchema = z.object({
-  email: z
-    .string()
-    .trim()
-    .min(1, "សូមបញ្ចូលអ៊ីមែល")
-    .email("អ៊ីមែលមិនត្រឹមត្រូវ")
-    .max(100, "អ៊ីមែលវែងពេក"),
-
-  password: z
-    .string()
-    .min(8, "លេខសម្ងាត់ត្រូវមានយ៉ាងតិច 8 តួ")
-    .max(64, "លេខសម្ងាត់វែងពេក"),
-});
-
-type LoginFormData = z.infer<typeof loginSchema>;
 
 const LoginPage = () => {
   const router = useRouter();
 
-  const { login } = useAuth();
+  const { login, loading, isAuthenticated } = useAuth();
 
   const [serverError, setServerError] = useState("");
   const [showPassword, setShowPassword] = useState(false);
 
-  const {
-    register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
-  } = useForm<LoginFormData>({
-    resolver: zodResolver(loginSchema),
-    mode: "onChange",
-  });
+  const {register, handleSubmit, formState: { errors, isSubmitting },} = useForm<LoginFormData>({resolver: zodResolver(loginSchema), mode: "onChange",});
+
+  useEffect(() => {
+    if (!loading && isAuthenticated) {
+      router.push("/");
+    }
+  }, [loading, isAuthenticated]);
 
   const onSubmit = async (data: LoginFormData) => {
     try {
@@ -58,7 +42,7 @@ const LoginPage = () => {
     } catch (error: any) {
       setServerError(
         // error?.response?.data?.message || error?.message ||
-        "Incorrect email or password",
+        "Invalid email or password",
       );
     }
   };
@@ -96,12 +80,12 @@ const LoginPage = () => {
             onSubmit={handleSubmit(onSubmit)}
             className="space-y-6 w-full md:max-w-[400px]"
           >
-            {/* SERVER ERROR */}
-            {serverError && (
-              <div className="bg-red-100 border border-red-300 text-red-700 px-5 py-3 rounded-2xl text-sm font-medium">
-                {serverError}
-              </div>
-            )}
+            {/*/!* SERVER ERROR *!/*/}
+            {/*{serverError && (*/}
+            {/*  <div className="bg-red-100 border border-red-300 text-red-700 px-5 py-3 rounded-2xl text-sm font-medium">*/}
+            {/*    {serverError}*/}
+            {/*  </div>*/}
+            {/*)}*/}
 
             <div className="space-y-2">
               <label className="block text-[13px] font-bold text-[#a47e5e] ml-6">
