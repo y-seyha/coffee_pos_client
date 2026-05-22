@@ -3,7 +3,7 @@ import {
     Product,
     ProductListResponse,
     ClientGetProductsQuery,
-    CreateProductDto,
+    CreateProductDto, GetProductsQuery,
 } from "@/types";
 
 export const productApi = {
@@ -22,19 +22,32 @@ export const productApi = {
 
 
     // ------ADMIN------
-    getAll: (params: ClientGetProductsQuery) =>
-        apiRequest<ProductListResponse>("get", "/products", undefined, {
-            params,
-        }),
+    getAll: (params: GetProductsQuery) =>
+        apiRequest<ProductListResponse>(
+            "get",
+            "/products",
+            undefined,
+            {
+                params,
+            }
+        ),
 
     getById: (id: number) =>
         apiRequest<Product>("get", `/products/${id}`),
 
-    create: (dto: CreateProductDto) =>
-        apiRequest<Product>("post", "/products", dto),
+    create: (formData: FormData) =>
+        apiRequest<Product>("post", "/products", formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },}
+        ),
 
-    update: (id: number, dto: Partial<CreateProductDto>) =>
-        apiRequest<Product>("patch", `/products/${id}`, dto),
+    update: (id: number, formData: FormData) =>
+        apiRequest<Product>("patch", `/products/${id}`, formData, {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },}
+        ),
 
     delete: (id: number) =>
         apiRequest<{ message: string }>("delete", `/products/${id}`),
@@ -53,16 +66,17 @@ export const productApi = {
     removeDiscount: (productId: number) =>
         apiRequest("delete", `/products/${productId}/discount`),
 
-    attachVariantGroups: (
+    attachVariantGroup: (
         productId: number,
         dto: {
-            variant_groups: {
                 variant_group_id: number;
-                is_required?: boolean;
-                sort_order?: number;
-            }[];
         }
     ) =>
-        apiRequest("post", `/products/${productId}/variant-groups`, dto),
+        apiRequest("post", `/products/${productId}/variant-group`, dto),
+
+    toggleAvailability: (productId: number, is_available?: boolean) =>
+        apiRequest("patch", `/products/${productId}/availability`, {
+            is_available,
+        }),
 };
 

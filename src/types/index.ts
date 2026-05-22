@@ -58,21 +58,21 @@ export type CartResponse = {
     summary: CartSummary;
 };
 
-
-export type ProductImage = {
-    url: string;
-    id: string | number;
-};
-
-export type Product = {
-    id: number;
-    name: string;
-    price: number | string;
-    images?: ProductImage[];
-    final_price?: number;
-    sku: string;
-    description?: string;
-};
+//
+// export type ProductImage = {
+//     url: string;
+//     id: string | number;
+// };
+//
+// export type product = {
+//     id: number;
+//     name: string;
+//     price: number | string;
+//     images?: ProductImage[];
+//     final_price?: number;
+//     sku: string;
+//     description?: string;
+// };
 
 export type ProductListResponse = {
     data: Product[];
@@ -81,6 +81,16 @@ export type ProductListResponse = {
         page: number;
         lastPage: number;
     };
+};
+export type GetProductsQuery = {
+    page?: number;
+    limit?: number;
+    search?: string;
+    categoryId?: number;
+
+    sortBy?: "id" | "name" | "price" | "created_at";
+
+    sortOrder?: "ASC" | "DESC";
 };
 
 export type ClientGetProductsQuery = {
@@ -284,4 +294,65 @@ export type UpdateVariantOptionDto = {
     name?: string;
     value?: string;
     variant_group_id?: number;
+};
+
+export type ProductImage = {
+    id: string | number;
+    url: string;
+    originalName?: string;
+};
+
+export type ProductCategory = {
+    id: number;
+    name: string;
+    description?: string;
+    is_active?: boolean;
+    sort_order?: number;
+};
+
+export type ProductDiscount = {
+    id: number;
+    name: string;
+    type: "PERCENTAGE" | "FIXED";
+    value: number | string;
+    is_active: boolean;
+    start_date?: string | null;
+    end_date?: string | null;
+};
+
+export type ProductVariantGroup = {
+    id: number;
+    product_id: number;
+    variant_group_id: number;
+    is_required: boolean;
+    sort_order: number;
+};
+
+export type Product = {
+    id: number;
+    category_id: number;
+    category?: ProductCategory;
+    name: string;
+    description?: string;
+    sku: string;
+    price: number | string;
+    cost_price?: number | null;
+    final_price?: number;
+    discount_id?: number | null;
+    discount?: ProductDiscount | null;
+    is_available: boolean;
+    is_active: boolean;
+    sort_order: number;
+    created_at?: string;
+    updated_at?: string;
+    images?: ProductImage[];
+    variant_groups?: ProductVariantGroup[];
+    sold?: number;
+};
+
+export type Discount = {
+    id: number;
+    name: string;
+    type: string;
+    value: string;
 };
