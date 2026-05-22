@@ -121,3 +121,130 @@ export type CheckoutApiResponse = {
         amount: number;
     };
 };
+
+
+
+export type OrderStatusRaw = {
+    status: string;
+    count: number;
+};
+
+export type TopProductDto = {
+    product_id: number;
+    name: string;
+    total_sold: number;
+};
+
+export type AnalyticsReport = {
+    summary: {
+        total_orders: number;
+        completed_orders: number;
+        pending_orders: number;
+        cancelled_orders?: number;
+        confirmed_orders?: number;
+    };
+
+    sales: {
+        daily: number;
+        monthly: number;
+    };
+
+    top_products: TopProductDto[];
+
+    status_stats: OrderStatusRaw[];
+
+    payment?: PaymentDashboard;
+};
+
+export type OrderStatus =
+    | "PENDING"
+    | "CONFIRMED"
+    | "COMPLETED"
+    | "CANCELLED";
+
+
+export interface OrderItem {
+    id: number;
+
+    product_id: number;
+
+    name: string;
+
+    quantity: number;
+
+    price: number;
+
+    subtotal: number;
+}
+
+export interface Payment {
+    id: number;
+
+    transaction_id?: string;
+
+    payment_status:
+        | "PENDING"
+        | "PAID"
+        | "FAILED"
+        | "REFUNDED";
+
+    amount: number;
+    remarks?: string;
+    paid_at?: string;
+    created_at: string;
+}
+
+export interface Order {
+    id: number;
+    order_number?: string;
+    order_status: OrderStatus;
+    grand_total: number;
+    order_type?: string;
+    cancelled_at?: string | null;
+    created_at: string;
+    updated_at?: string;
+    items?: OrderItem[];
+    payments?: Payment[];
+}
+
+export interface OrderStatusStat {
+    status: OrderStatus;
+    count: number;
+}
+
+export type OrderStatusStats =
+    OrderStatusStat[];
+
+export interface OrderReport {
+    summary: {
+        total_orders: number;
+        completed_orders: number;
+        pending_orders: number;
+    };
+    sales: {
+        daily: number;
+        monthly: number;
+    };
+    top_products: TopProductDto[];
+    status_stats: OrderStatusStats;
+}
+
+export type PaymentMethodStat = {
+    method: string;
+    count: number;
+};
+
+export type PaymentDashboard = {
+    revenue: number;
+    today_payments: number;
+    failed_payments: number;
+    refunded_payments: number;
+    payment_methods: PaymentMethodStat[];
+};
+
+export type PaginatedResponse<T> = {
+    data: T;
+    total: number;
+    page: number;
+    limit: number;
+};

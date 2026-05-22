@@ -64,6 +64,5 @@ export const productApi = {
         }
     ) =>
         apiRequest("post", `/products/${productId}/variant-groups`, dto),
-
 };
 
