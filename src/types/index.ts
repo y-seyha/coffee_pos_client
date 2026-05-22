@@ -122,8 +122,6 @@ export type CheckoutApiResponse = {
     };
 };
 
-
-
 export type OrderStatusRaw = {
     status: string;
     count: number;
@@ -143,16 +141,12 @@ export type AnalyticsReport = {
         cancelled_orders?: number;
         confirmed_orders?: number;
     };
-
     sales: {
         daily: number;
         monthly: number;
     };
-
     top_products: TopProductDto[];
-
     status_stats: OrderStatusRaw[];
-
     payment?: PaymentDashboard;
 };
 
@@ -165,29 +159,21 @@ export type OrderStatus =
 
 export interface OrderItem {
     id: number;
-
     product_id: number;
-
     name: string;
-
     quantity: number;
-
     price: number;
-
     subtotal: number;
 }
 
 export interface Payment {
     id: number;
-
     transaction_id?: string;
-
     payment_status:
         | "PENDING"
         | "PAID"
         | "FAILED"
         | "REFUNDED";
-
     amount: number;
     remarks?: string;
     paid_at?: string;
@@ -247,4 +233,55 @@ export type PaginatedResponse<T> = {
     total: number;
     page: number;
     limit: number;
+};
+
+
+export type VariantOption = {
+    id: number;
+    name: string;
+    variant_group_id: number;
+    variant_group?: VariantGroup;
+    price_adjustment_type: "ADD" | "SET" | "PERCENT";
+    price_adjustment: number;
+    is_default: boolean;
+    is_active: boolean;
+    sort_order: number;
+    created_at?: string;
+    updated_at?: string;
+};
+
+export type VariantGroup = {
+    id: number;
+    name: string;
+    code: string;
+    sort_order: number;
+    options?: VariantOption[];
+};
+
+export type CreateVariantGroupDto = {
+    name: string;
+    code: string;
+    sort_order?: number;
+};
+
+export type UpdateVariantGroupDto = {
+    name?: string;
+    code?: string;
+    sort_order?: number;
+};
+
+export type CreateVariantOptionDto = {
+    variant_group_id: number;
+    name: string;
+    price_adjustment_type?: "ADD" | "SET" | "PERCENT";
+    price_adjustment?: number;
+    is_default?: boolean;
+    is_active?: boolean;
+    sort_order?: number;
+};
+
+export type UpdateVariantOptionDto = {
+    name?: string;
+    value?: string;
+    variant_group_id?: number;
 };
