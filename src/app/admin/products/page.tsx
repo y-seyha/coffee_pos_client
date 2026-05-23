@@ -274,7 +274,7 @@ export default function ProductDashboardPage() {
             </div>
 
             {/*Filter*/}
-            <div className="bg-white border rounded-2xl p-4 grid grid-cols-1 md:grid-cols-4 gap-4">
+            <div className="bg-white border rounded-2xl p-4 grid grid-cols-1 md:grid-cols-5 gap-4">
 
                 <Input
                     placeholder="Search by name or SKU"
@@ -748,24 +748,73 @@ export default function ProductDashboardPage() {
                 onClose={() => setDiscountModalOpen(false)}
             >
                 <div className="space-y-3">
+                    {discounts.map((d) => {
+                        const isActive = d.is_active;
 
-                    {discounts.map((d) => (
-                        <button
-                            key={d.id}
-                            className="w-full border rounded-lg p-3 text-left hover:bg-gray-50"
-                            onClick={() => {
-                                setSelectedDiscount(d);
-                                setConfirmDiscountOpen(true);
-                            }}
-                        >
-                            <p className="font-medium">{d.name}</p>
+                        return (
+                            <button
+                                key={d.id}
+                                disabled={!isActive}
+                                className={`
+                        w-full border rounded-xl p-4 text-left transition
+                        ${
+                                    isActive
+                                        ? "hover:bg-gray-50 border-gray-200"
+                                        : "bg-gray-100 border-gray-200 opacity-60 cursor-not-allowed"
+                                }
+                    `}
+                                onClick={() => {
+                                    if (!isActive) return;
 
-                            <p className="text-xs text-muted-foreground">
-                                {d.type} - {d.value}
-                            </p>
-                        </button>
-                    ))}
+                                    setSelectedDiscount(d);
+                                    setConfirmDiscountOpen(true);
+                                }}
+                            >
+                                <div className="flex items-start justify-between">
+                                    <div>
+                                        <p className="font-medium text-sm">
+                                            {d.name}
+                                        </p>
 
+                                        <p className="text-xs text-muted-foreground mt-1">
+                                            {d.type} - {d.value}
+                                        </p>
+                                    </div>
+
+                                    <span
+                                        className={`
+                                text-[11px] px-2 py-1 rounded-full font-medium
+                                ${
+                                            isActive
+                                                ? "bg-green-100 text-green-700"
+                                                : "bg-red-100 text-red-700"
+                                        }
+                            `}
+                                    >
+                            {isActive ? "Active" : "Inactive"}
+                        </span>
+                                </div>
+
+                                {(d.start_date || d.end_date) && (
+                                    <div className="mt-2 text-[11px] text-muted-foreground">
+                                        {d.start_date && (
+                                            <p>
+                                                Start:{" "}
+                                                {new Date(d.start_date).toLocaleDateString()}
+                                            </p>
+                                        )}
+
+                                        {d.end_date && (
+                                            <p>
+                                                End:{" "}
+                                                {new Date(d.end_date).toLocaleDateString()}
+                                            </p>
+                                        )}
+                                    </div>
+                                )}
+                            </button>
+                        );
+                    })}
                 </div>
             </AppModal>
 

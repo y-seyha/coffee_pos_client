@@ -353,6 +353,16 @@ export type Product = {
 export type Discount = {
     id: number;
     name: string;
-    type: string;
-    value: string;
+    type: "PERCENTAGE" | "FIXED";
+    value: number;
+    is_active: boolean;
+    created_at?: string;
+    end_date: string | null;
+    start_date: string | null;
+};
+
+export type CreateDiscountDto = {
+    name: string;
+    type: "PERCENTAGE" | "FIXED";
+    value: number;
 };

@@ -20,6 +20,7 @@ export function useProducts(initialParams: ClientGetProductsQuery = {}) {
         return [];
     };
 
+
     const fetchProducts = async (
         override?: ClientGetProductsQuery,
         newSource?: ProductSource
@@ -29,7 +30,12 @@ export function useProducts(initialParams: ClientGetProductsQuery = {}) {
             setError(null);
 
             const finalSource = newSource || source;
-            const query = { ...params, ...override };
+
+            const query = {
+                limit: 50,
+                ...params,
+                ...override,
+            };
 
             let res: any;
 
@@ -51,6 +57,8 @@ export function useProducts(initialParams: ClientGetProductsQuery = {}) {
 
                 default:
                     console.log("All Hit");
+                    console.log(query);
+
                     res = await productApi.getClientProducts(query);
                     break;
             }

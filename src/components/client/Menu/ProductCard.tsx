@@ -10,11 +10,15 @@ const ProductCard = ({ name, price, image, onOrder }: ProductCardProps) => {
     <div className="bg-[#fcfcfc] p-4 rounded-[30px] border border-[#f1f1f1] hover:shadow-lg hover:-translate-y-1 transition-all duration-200">
       {/* Image Box */}
       <div className="bg-[#f7f7f7] rounded-[24px] aspect-square flex items-center justify-center mb-6">
-        <img
-          src={image}
-          alt={name}
-          className="w-[76%] h-[76%] object-contain"
-        />
+          {image ? (
+              <img
+                  src={image}
+                  alt={name}
+                  className="w-[76%] h-[76%] object-contain"
+              />
+          ) : (
+              <div className="text-sm text-gray-400">No Image</div>
+          )}
       </div>
 
       {/* Content */}

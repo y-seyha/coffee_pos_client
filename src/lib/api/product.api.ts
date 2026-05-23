@@ -17,7 +17,7 @@ export const productApi = {
     getByCategory: (id: number) =>
         apiRequest<Product[]>(
             "get",
-            `/products/category/${id}`
+            `/products/categories/${id}`
         ),
 
 
