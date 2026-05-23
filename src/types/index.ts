@@ -1,9 +1,9 @@
-export type User = {
-    id: number;
-    email: string;
-    name: string;
-    role: string;
-};
+// export type User = {
+//     id: number;
+//     email: string;
+//     name: string;
+//     role: string;
+// };
 
 export type CartVariant = {
     group: string;
@@ -57,22 +57,6 @@ export type CartResponse = {
     };
     summary: CartSummary;
 };
-
-//
-// export type ProductImage = {
-//     url: string;
-//     id: string | number;
-// };
-//
-// export type product = {
-//     id: number;
-//     name: string;
-//     price: number | string;
-//     images?: ProductImage[];
-//     final_price?: number;
-//     sku: string;
-//     description?: string;
-// };
 
 export type ProductListResponse = {
     data: Product[];
@@ -444,3 +428,44 @@ export type RoleListResponse = {
     page: number;
     total_pages: number;
 };
+
+export type User = {
+    id: number;
+    email: string;
+    name: string;
+    phone?: string;
+    is_active: boolean;
+    created_at: string;
+    updated_at: string;
+    last_login_at?: string;
+    role?: {
+        id: number;
+        name: string;
+    };
+    staffProfile?: {
+        employee_code?: string;
+        position?: string;
+        salary?: string;
+        hire_date?: string;
+        address?: string;
+    };
+};
+
+export type UserListResponse = {
+    data: User[];
+    meta: {
+        total: number;
+        page: number;
+        limit: number;
+        totalPages: number;
+
+        sortBy: string;
+        order: "ASC" | "DESC";
+    };
+};
+
+export enum Position {
+    CASHIER = "Cashier",
+    BARISTA = "Barista",
+    MANAGER = "Manager",
+}

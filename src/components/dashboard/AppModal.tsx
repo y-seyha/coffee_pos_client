@@ -18,7 +18,7 @@ type AppModalProps = {
 export function AppModal({ open, title, children, onClose }: AppModalProps) {
     return (
         <Dialog open={open} onOpenChange={onClose}>
-            <DialogContent className="rounded-2xl max-w-lg">
+            <DialogContent className="rounded-2xl w-full max-w-4xl">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-semibold">
                         {title}

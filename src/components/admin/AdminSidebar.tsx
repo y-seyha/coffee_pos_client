@@ -36,6 +36,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
+import {useAuth} from "@/context/AuthContext";
 
 type SidebarItem = {
     title: string;
@@ -97,6 +98,7 @@ const sidebarData: SidebarItem[] = [
 function SidebarContent() {
     const pathname = usePathname();
     const router = useRouter();
+    const {logout} = useAuth();
 
     const isActive = (href?: string) => pathname === href;
 
@@ -208,6 +210,7 @@ function SidebarContent() {
                 <Button
                     variant="destructive"
                     className="w-full justify-start gap-2"
+                    onClick={logout}
                 >
                     <LogOut className="h-4 w-4" />
                     Logout
