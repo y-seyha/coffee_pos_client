@@ -422,3 +422,25 @@ export type CreateDiscountDto = {
     type: "PERCENTAGE" | "FIXED";
     value: number;
 };
+
+export type Role = {
+    id: number;
+    name: string;
+    description?: string;
+
+    users?: {
+        id: number;
+        name: string;
+        email: string;
+    }[];
+
+    created_at?: string;
+    updated_at?: string;
+};
+
+export type RoleListResponse = {
+    data: Role[];
+    total: number;
+    page: number;
+    total_pages: number;
+};
