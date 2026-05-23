@@ -1,5 +1,5 @@
 import { apiRequest } from "@/helper/api.helper";
-import {Order, OrderReport, OrderStatusStats, PaginatedResponse, TopProductDto} from "@/types";
+import {Order, OrderList, OrderReport, OrderStatusStats, PaginatedResponse, TopProductDto} from "@/types";
 
 export const orderApi = {
     getAll: (params?: any) =>
@@ -9,6 +9,11 @@ export const orderApi = {
             undefined,
             { params }
         ),
+
+    getList: (params?: any) =>
+        apiRequest<OrderList>("get", "/orders/list", undefined, { params }
+        ),
+
     getById: (id: number) =>
         apiRequest<Order>("get", `/orders/${id}`),
 

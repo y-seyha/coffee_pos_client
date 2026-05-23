@@ -41,12 +41,10 @@ export function useProducts(initialParams: ClientGetProductsQuery = {}) {
 
             switch (finalSource) {
                 case "best-sellers":
-                    console.log("Best sellers Hit");
                     res = await productApi.getBestSellers(query.limit ?? 20);
                     break;
 
                 case "category":
-                    console.log("Category hit");
                     if (!query.categoryId) {
                         setData([]);
                         setLoading(false);
@@ -56,9 +54,6 @@ export function useProducts(initialParams: ClientGetProductsQuery = {}) {
                     break;
 
                 default:
-                    console.log("All Hit");
-                    console.log(query);
-
                     res = await productApi.getClientProducts(query);
                     break;
             }

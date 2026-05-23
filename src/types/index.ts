@@ -159,49 +159,69 @@ export type AnalyticsReport = {
     status_stats: OrderStatusRaw[];
     payment?: PaymentDashboard;
 };
-
 export type OrderStatus =
     | "PENDING"
     | "CONFIRMED"
     | "COMPLETED"
     | "CANCELLED";
 
+export type OrderType = "DINEIN" | "DELIVERY" | "TAKEAWAY";
 
 export interface OrderItem {
     id: number;
     product_id: number;
     name: string;
+    unit_price: string;
     quantity: number;
-    price: number;
-    subtotal: number;
+    discount_amount: string;
+    total_price: string;
 }
 
 export interface Payment {
     id: number;
-    transaction_id?: string;
-    payment_status:
-        | "PENDING"
-        | "PAID"
-        | "FAILED"
-        | "REFUNDED";
-    amount: number;
-    remarks?: string;
+    payment_number: string;
+    payment_method: string;
+    payment_status: string;
+    amount: string;
+    transaction_id?: string | null;
     paid_at?: string;
-    created_at: string;
+    remarks?: string | null;
 }
 
 export interface Order {
     id: number;
-    order_number?: string;
+    order_number: string;
+    order_type: OrderType;
+
+    customer_id?: number | null;
+    table_id?: number | null;
+    staff_id?: number;
+
     order_status: OrderStatus;
-    grand_total: number;
-    order_type?: string;
+
+    notes?: string | null;
+
+    subtotal: string;
+    discount_amount: string;
+    tax_amount: string;
+    grand_total: string;
+
     cancelled_at?: string | null;
+
     created_at: string;
-    updated_at?: string;
-    items?: OrderItem[];
-    payments?: Payment[];
+    updated_at: string;
+
+    items: OrderItem[];
+    payments: Payment[];
 }
+
+export type OrderList = {
+    data: Order[];
+    total: number;
+    page: number;
+    limit: number;
+    total_pages: number;
+};
 
 export interface OrderStatusStat {
     status: OrderStatus;
