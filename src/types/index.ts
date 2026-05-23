@@ -177,16 +177,52 @@ export interface OrderItem {
     total_price: string;
 }
 
-export interface Payment {
+export type PaymentStatus = "PAID" | "PENDING" | "FAILED" | "REFUNDED";
+export type PaymentMethod = "CASH" | "KHQR";
+
+export type Payment = {
     id: number;
     payment_number: string;
-    payment_method: string;
-    payment_status: string;
-    amount: string;
+    payment_method: PaymentMethod;
+    payment_status: PaymentStatus;
+    amount: string | number;
     transaction_id?: string | null;
-    paid_at?: string;
+    payment_response?: string | null;
+    paid_at?: string | null;
     remarks?: string | null;
-}
+
+    created_at: string;
+    updated_at: string;
+
+    order: {
+        id: number;
+        order_number: string;
+        order_type: string;
+        grand_total: string;
+        order_status : OrderStatus;
+    };
+};
+
+export type PaymentDashboard = {
+    revenue: string | number;
+    today_payments: string | number;
+    failed_payments: number;
+    refunded_payments: number;
+
+    payment_methods: {
+        method: PaymentMethod;
+        count: string | number;
+    }[];
+
+    latest_transactions: Payment[];
+};
+
+export type PaymentListResponse = {
+    data: Payment[];
+    total: number;
+    page: number;
+    limit: number;
+};
 
 export interface Order {
     id: number;
@@ -250,13 +286,13 @@ export type PaymentMethodStat = {
     count: number;
 };
 
-export type PaymentDashboard = {
-    revenue: number;
-    today_payments: number;
-    failed_payments: number;
-    refunded_payments: number;
-    payment_methods: PaymentMethodStat[];
-};
+// export type PaymentDashboard = {
+//     revenue: number;
+//     today_payments: number;
+//     failed_payments: number;
+//     refunded_payments: number;
+//     payment_methods: PaymentMethodStat[];
+// };
 
 export type PaginatedResponse<T> = {
     data: T;

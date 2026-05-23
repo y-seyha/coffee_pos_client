@@ -29,3 +29,6 @@ export const CATEGORIES = [
     { id: 3, name: "ប្រភេទក្តៅៗ" },
     { id: 4, name: "ប្រភេទអាហារសម្រន់" },
 ];
+
+export const toNumber = (v: string | number | undefined) =>
+    Number(v ?? 0);

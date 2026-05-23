@@ -1,31 +1,42 @@
 import { apiRequest } from "@/helper/api.helper";
-import {AnalyticsReport, PaymentDashboard} from "@/types";
+import {
+    Payment,
+    PaymentDashboard,
+    PaginatedResponse,
+} from "@/types";
 
 export const paymentApi = {
     getPaymentDashboard: () =>
         apiRequest<PaymentDashboard>("get", "/payments/dashboard"),
 
     getAll: (params?: any) =>
-        apiRequest("get", "/payments", undefined, { params }),
+        apiRequest<PaginatedResponse<Payment[]>>(
+            "get",
+            "/payments",
+            undefined,
+            { params }
+        ),
 
     getById: (id: number) =>
-        apiRequest("get", `/payments/${id}`),
+        apiRequest<Payment>("get", `/payments/${id}`),
 
-    markPaid: (id: number, transaction_id: string) =>
-        apiRequest("patch", `/payments/${id}/paid`, {
-            transaction_id,
-        }),
+    markPaid: (
+        id: number,
+        data: {
+            transaction_id?: string;
+            remarks?: string;
+            payment_response?: string;
+        }
+    ) =>
+        apiRequest("patch", `/payments/${id}/paid`, data),
 
-    markFailed: (id: number, remarks: string) =>
+    markFailed: (id: number, remarks?: string) =>
         apiRequest("patch", `/payments/${id}/failed`, {
             remarks,
         }),
 
-    refund: (id: number, reason: string) =>
+    refund: (id: number, reason?: string) =>
         apiRequest("patch", `/payments/${id}/refund`, {
             reason,
         }),
-
-    getReport: () =>
-        apiRequest<AnalyticsReport>("get", "/orders/report"),
 };
