@@ -2,6 +2,8 @@
 
 import { useEffect, useRef, useState } from "react";
 import { Search, X } from "lucide-react";
+import { useAuth } from "@/context/AuthContext";
+import { useRouter } from "next/navigation";
 
 type NavbarProps = {
     onSearch?: (query: string) => void;
@@ -12,6 +14,9 @@ const Navbar = ({ onSearch }: NavbarProps) => {
     const [loading, setLoading] = useState(false);
 
     const lastSentRef = useRef("");
+
+    const { user } = useAuth();
+    const router = useRouter();
 
     useEffect(() => {
         const timeout = setTimeout(() => {
@@ -44,6 +49,8 @@ const Navbar = ({ onSearch }: NavbarProps) => {
         onSearch?.("");
     };
 
+    const isAdmin = user?.role === "ADMIN";
+
     return (
         <nav className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white border-b border-gray-100 gap-3 sm:gap-6">
 
@@ -58,8 +65,7 @@ const Navbar = ({ onSearch }: NavbarProps) => {
                 </span>
             </div>
 
-            {/* SEARCH */}
-            <div className="flex-1 max-w-[220px] sm:max-w-md md:max-w-lg lg:max-w-xl relative">
+            <div className="flex-1 min-w-0 max-w-[220px] sm:max-w-md md:max-w-lg lg:max-w-xl relative">
 
                 <input
                     value={query}
@@ -71,45 +77,47 @@ const Navbar = ({ onSearch }: NavbarProps) => {
                     focus:outline-none focus:ring-2 focus:ring-[#cd8c52]/20 text-sm sm:text-base"
                 />
 
-                {/* CLEAR BUTTON */}
                 {query && (
                     <button
                         onClick={handleClear}
-                        className="
-    absolute
-    right-11 sm:right-25 md:right-25
-    top-1/2 -translate-y-1/2
-    text-gray-500 hover:text-black
-    z-10
-"
+                        className="absolute right-11 sm:right-25 md:right-25 top-1/2 -translate-y-1/2 text-gray-500"
                     >
                         <X size={16} />
                     </button>
                 )}
 
-                {/* SEARCH BUTTON */}
                 <button
                     onClick={handleSearch}
                     disabled={loading}
-                    className="
-                        absolute right-1 top-1 bottom-1
-                        px-3 sm:px-4
-                        bg-[#D5904B] text-white
-                        rounded-full flex items-center gap-1
-                        hover:bg-[#b57a46] transition
-                        disabled:opacity-60
-                    "
+                    className="absolute right-1 top-1 bottom-1 px-3 sm:px-4 bg-[#D5904B] text-white rounded-full flex items-center gap-1"
                 >
                     <Search size={16} />
                     <span className="text-xs font-khmer hidden sm:inline">
                         {loading ? "..." : "ស្វែងរក"}
                     </span>
                 </button>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+
+                {/* ADMIN BUTTON */}
+                {isAdmin && (
+                    <button
+                        onClick={() => router.push("/admin")}
+                        className="
+                            px-3 sm:px-4 py-1.5 sm:py-2
+                            text-xs sm:text-sm font-semibold
+                            rounded-full bg-[#D5904B]  text-white
+                            whitespace-nowrap
+                        "
+                    >
+                        <span className="hidden sm:inline">Admin Dashboard</span>
+                        <span className="sm:hidden">Dashboard</span>
+                    </button>
+                )}
 
             </div>
 
-            {/* SPACER */}
-            <div className="hidden md:block w-20 lg:w-32" />
         </nav>
     );
 };

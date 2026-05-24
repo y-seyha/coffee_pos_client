@@ -1,8 +1,7 @@
 // export type User = {
 //     id: number;
 //     email: string;
-//     name: string;
-//     role: string;
+//     role: "ADMIN" | "MANAGER" | "CASHIER";
 // };
 
 export type CartVariant = {
@@ -444,10 +443,7 @@ export type User = {
     created_at: string;
     updated_at: string;
     last_login_at?: string;
-    role?: {
-        id: number;
-        name: string;
-    };
+    role: "ADMIN" | "MANAGER" | "CASHIER";
     staffProfile?: {
         employee_code?: string;
         position?: string;
