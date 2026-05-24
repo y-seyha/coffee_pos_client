@@ -23,6 +23,7 @@ import {PaymentActionsDropdown} from "@/components/dashboard/payments/PaymentAct
 import {toast} from "sonner";
 import {Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Textarea} from "@/components/ui/textarea";
+import {RefreshCw} from "lucide-react";
 
 export default function PaymentsPage() {
     const [dashboard, setDashboard] = useState<PaymentDashboard | undefined>(undefined);
@@ -128,16 +129,40 @@ export default function PaymentsPage() {
             setActionLoading(false);
         }
     };
+    const refreshAll = async () => {
+        setLoading(true);
+        try {
+            await Promise.all([fetchPayments(), fetchDashboard()]);
+        } finally {
+            setLoading(false);
+        }
+    };
+    useEffect(() => {
+        const interval = setInterval(() => {
+            fetchPayments();
+            fetchDashboard();
+        }, 30000);
+
+        return () => clearInterval(interval);
+    }, [filters]);
+
 
     return (
         <div className="p-6 space-y-6 bg-gray-50 min-h-screen">
 
             {/* HEADER */}
-            <div>
-                <h1 className="text-2xl font-bold">Payments Dashboard</h1>
-                <p className="text-sm text-muted-foreground">
-                    Manage payments, refunds and transaction status
-                </p>
+            <div className="flex items-center justify-between">
+                <div>
+                    <h1 className="text-2xl font-bold">Payments Dashboard</h1>
+                    <p className="text-sm text-muted-foreground">
+                        Manage payments, refunds and transaction status
+                    </p>
+                </div>
+
+                <Button onClick={refreshAll}>
+                    <RefreshCw className={`mr-2 h-4 w-4 ${_loading ? "animate-spin" : ""}`} />
+                    Refresh
+                </Button>
             </div>
 
             {/* KPI CARDS */}

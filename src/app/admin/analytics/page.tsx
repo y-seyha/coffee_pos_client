@@ -34,16 +34,28 @@ export default function AnalyticsPage() {
 
     const revenue =
         filter === "Today"
-            ? report?.sales?.daily
-            : report?.sales?.monthly;
+            ? Number(report?.sales?.daily ?? 0)
+            : Number(report?.sales?.monthly ?? 0);
 
 
     const revenueChartData = useMemo(() => {
-        if (!report) return [];
+        const sales = report?.sales;
 
-        return filter === "Today"
-            ? [{date: "Today", revenue: report.sales.daily,},]
-            : [{date: "This Month", revenue: report.sales.monthly,},];
+        if (!sales) return [];
+
+        if (filter === "Today") {
+            return (sales.daily_series ?? []).map((d: any) => ({
+                date: new Date(d.date).toLocaleDateString("en-US", {
+                    weekday: "short",
+                }),
+                revenue: Number(d.revenue ?? 0),
+            }));
+        }
+
+        return (sales.monthly_series ?? []).map((d: any) => ({
+            date: d.month ?? "",
+            revenue: Number(d.revenue ?? 0),
+        }));
     }, [filter, report]);
 
     const topProductName = report?.top_products?.[0]?.name;
@@ -113,14 +125,57 @@ export default function AnalyticsPage() {
 
             {/*Chart*/}
             <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
-                <div className="xl:col-span-2 rounded-2xl border bg-background p-4">
-                    <RevenueChart data={revenueChartData} />
+                {/* REVENUE CARD */}
+                <div className="xl:col-span-2 rounded-2xl border bg-background p-5 shadow-sm">
+
+                    {/* HEADER */}
+                    <div className="flex items-center justify-between mb-4">
+                        <div>
+                            <h2 className="text-sm font-semibold">Revenue Overview</h2>
+                            <p className="text-xs text-muted-foreground">
+                                Sales performance over time
+                            </p>
+                        </div>
+
+                        <div className="text-xs px-2 py-1 rounded-full bg-black text-white">
+                            {filter}
+                        </div>
+                    </div>
+
+                    {/* OPTIONAL KPI STRIP */}
+                    <div className="grid grid-cols-3 gap-3 mb-4">
+                        <div className="rounded-lg bg-gray-50 p-2">
+                            <p className="text-xs text-muted-foreground">Today</p>
+                            <p className="font-semibold text-sm">
+                                ${report?.sales?.daily ?? 0}
+                            </p>
+                        </div>
+
+                        <div className="rounded-lg bg-gray-50 p-2">
+                            <p className="text-xs text-muted-foreground">Month</p>
+                            <p className="font-semibold text-sm">
+                                ${report?.sales?.monthly ?? 0}
+                            </p>
+                        </div>
+
+                        <div className="rounded-lg bg-gray-50 p-2">
+                            <p className="text-xs text-muted-foreground">Orders</p>
+                            <p className="font-semibold text-sm">
+                                {report?.summary?.total_orders ?? 0}
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* CHART */}
+                    <div className="h-[280px]">
+                        <RevenueChart data={revenueChartData} />
+                    </div>
                 </div>
 
-                <div className="rounded-2xl border bg-background p-4">
+                {/* PAYMENT */}
+                <div className="rounded-2xl border bg-background p-4 shadow-sm">
                     <PaymentSummaryCard dashboard={report?.payment} />
                 </div>
-
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
@@ -153,23 +208,22 @@ export default function AnalyticsPage() {
 
                 <SectionCard title="Top Products">
                     {report?.top_products?.length ? (
-                        <div className="space-y-3">
-                            {report.top_products.map(
-                                (p: any, i: number) => (
+                        <div className="relative">
+                            {/* scroll container */}
+                            <div className="max-h-60 overflow-y-auto space-y-2 pr-2">
+                                {report.top_products.map((p: any, i: number) => (
                                     <div
                                         key={i}
                                         className="flex items-center justify-between rounded-lg border p-3"
                                     >
-                                        <span className="font-medium">
-                                            {p.name}
-                                        </span>
+                                        <span className="font-medium">{p.name}</span>
 
                                         <span className="text-sm text-muted-foreground">
-                                            {p.total_sold}
-                                        </span>
+                            {p.total_sold}
+                        </span>
                                     </div>
-                                )
-                            )}
+                                ))}
+                            </div>
                         </div>
                     ) : (
                         <EmptyState message="No products data" />
@@ -179,6 +233,11 @@ export default function AnalyticsPage() {
 
             {/*Insight*/}
             <div className="flex flex-col xl:flex-row gap-6">
+
+                {/* Recent Orders */}
+                <div className="flex-1 rounded-2xl border bg-background p-4">
+                    <RecentOrdersCard orders={orders} />
+                </div>
 
                 {/* Quick Insights */}
                 <div className="flex-1">
@@ -206,11 +265,6 @@ export default function AnalyticsPage() {
                                 )?.count ?? 0,
                         }}
                     />
-                </div>
-
-                {/* Recent Orders */}
-                <div className="flex-1 rounded-2xl border bg-background p-4">
-                    <RecentOrdersCard orders={orders} />
                 </div>
 
             </div>

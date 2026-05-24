@@ -13,29 +13,15 @@ const Navbar = ({ onSearch }: NavbarProps) => {
 
   const debounceRef = useRef<NodeJS.Timeout | null>(null);
 
-  // AUTO SEARCH (debounce)
-  useEffect(() => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
+    useEffect(() => {
+        if (!query) return;
 
-    debounceRef.current = setTimeout(async () => {
-      try {
-        setLoading(true);
+        const timeout = setTimeout(() => {
+            onSearch?.(query.trim());
+        }, 500);
 
-        await onSearch?.(query.trim());
-
-      } finally {
-        setLoading(false);
-      }
-    }, 500);
-
-    return () => {
-      if (debounceRef.current) {
-        clearTimeout(debounceRef.current);
-      }
-    };
-  }, [query]);
+        return () => clearTimeout(timeout);
+    }, [query]);
 
   // MANUAL SEARCH
   const handleSearch = async () => {

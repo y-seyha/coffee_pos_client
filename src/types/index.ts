@@ -135,14 +135,20 @@ export type AnalyticsReport = {
         cancelled_orders?: number;
         confirmed_orders?: number;
     };
+
     sales: {
         daily: number;
         monthly: number;
+        daily_series: { date: string; revenue: number }[];
+        monthly_series: { month: string; revenue: number }[];
     };
+
     top_products: TopProductDto[];
     status_stats: OrderStatusRaw[];
     payment?: PaymentDashboard;
 };
+
+
 export type OrderStatus =
     | "PENDING"
     | "CONFIRMED"

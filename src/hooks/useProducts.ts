@@ -1,18 +1,16 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { productApi } from "@/lib/api/product.api";
 import { ClientGetProductsQuery, Product } from "@/types";
 
 type ProductSource = "all" | "best-sellers" | "category";
-
 export function useProducts(initialParams: ClientGetProductsQuery = {}) {
-    const [params, setParams] = useState<ClientGetProductsQuery>(initialParams);
-    const [source, setSource] = useState<ProductSource>("all");
-
     const [data, setData] = useState<Product[]>([]);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const sourceRef = useRef<ProductSource>("all");
+    const paramsRef = useRef<ClientGetProductsQuery>(initialParams);
 
     const extractProducts = (res: any): Product[] => {
         if (Array.isArray(res)) return res;
@@ -20,23 +18,32 @@ export function useProducts(initialParams: ClientGetProductsQuery = {}) {
         return [];
     };
 
-
-    const fetchProducts = async (
-        override?: ClientGetProductsQuery,
-        newSource?: ProductSource
-    ) => {
+    const fetchProducts = useCallback(async (override?: ClientGetProductsQuery, newSource?: ProductSource) => {
         try {
             setLoading(true);
             setError(null);
-
-            const finalSource = newSource || source;
-
-            const query = {
+            if (newSource) {
+                sourceRef.current = newSource;
+            }
+            const finalSource = sourceRef.current;
+            let query: ClientGetProductsQuery = {
                 limit: 50,
-                ...params,
                 ...override,
             };
+            if (finalSource === "all") {
+                query = {
+                    limit: 50,
+                    ...override,
+                };
+                paramsRef.current = {};
+            }
 
+            if (finalSource === "category") {
+                query = {
+                    limit: 50,
+                    ...override,
+                };
+            }
             let res: any;
 
             switch (finalSource) {
@@ -47,7 +54,6 @@ export function useProducts(initialParams: ClientGetProductsQuery = {}) {
                 case "category":
                     if (!query.categoryId) {
                         setData([]);
-                        setLoading(false);
                         return;
                     }
                     res = await productApi.getByCategory(Number(query.categoryId));
@@ -59,27 +65,23 @@ export function useProducts(initialParams: ClientGetProductsQuery = {}) {
             }
 
             setData(extractProducts(res));
-            setParams(query);
-            setSource(finalSource);
+            paramsRef.current = query;
         } catch (err: any) {
             setError(err?.message || "Failed to fetch products");
         } finally {
             setLoading(false);
         }
-    };
+    }, []);
 
-    // initial load
     useEffect(() => {
         fetchProducts({}, "all");
-    }, []);
+    }, [fetchProducts]);
 
     return {
         data,
         loading,
         error,
-
-        refetch: (override?: ClientGetProductsQuery) =>
-            fetchProducts(override, source),
+        refetch: fetchProducts,
 
         setAll: (params?: ClientGetProductsQuery) =>
             fetchProducts(params, "all"),

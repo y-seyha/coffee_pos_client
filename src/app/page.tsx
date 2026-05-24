@@ -1,6 +1,6 @@
 "use client";
 
-import {useCallback, useState} from "react";
+import {useCallback, useRef, useState} from "react";
 
 import ProductCard from "../components/client/Menu/ProductCard";
 import OrderModal from "../components/client/modal/OrderModal";
@@ -24,8 +24,15 @@ export default function MainShopPage() {
   const [showPayment, setShowPayment] = useState(false);
 
 
-  const handleSearch = useCallback(async (query: string) => {
-    await setAll({
+  const hasInitSearch = useRef(false);
+
+  const handleSearch = useCallback((query: string) => {
+    if (!hasInitSearch.current) {
+      hasInitSearch.current = true;
+      if (!query) return; // prevent empty init call
+    }
+
+    setAll({
       search: query || undefined,
       page: 1,
     });

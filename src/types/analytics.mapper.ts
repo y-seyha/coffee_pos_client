@@ -1,10 +1,15 @@
-import {AnalyticsReport} from "@/types/index";
+import { AnalyticsReport } from "@/types/index";
 
 export function normalizeReport(report: any): AnalyticsReport {
     if (!report) {
         return {
             summary: { total_orders: 0, completed_orders: 0, pending_orders: 0 },
-            sales: { daily: 0, monthly: 0 },
+            sales: {
+                daily: 0,
+                monthly: 0,
+                daily_series: [],
+                monthly_series: [],
+            },
             top_products: [],
             status_stats: [],
             payment: undefined,
@@ -33,6 +38,15 @@ export function normalizeReport(report: any): AnalyticsReport {
         sales: {
             daily: Number(report.sales?.daily ?? 0),
             monthly: Number(report.sales?.monthly ?? 0),
+            daily_series: (report.sales?.daily_series ?? []).map((d: any) => ({
+                date: d.date,
+                revenue: Number(d.revenue ?? 0),
+            })),
+
+            monthly_series: (report.sales?.monthly_series ?? []).map((d: any) => ({
+                month: d.month,
+                revenue: Number(d.revenue ?? 0),
+            })),
         },
 
         top_products: (report.top_products ?? []).map((p: any) => ({
