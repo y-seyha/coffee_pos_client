@@ -1,6 +1,6 @@
 "use client";
 
-import {useCallback, useRef, useState} from "react";
+import { useCallback, useRef, useState } from "react";
 
 import ProductCard from "../components/client/Menu/ProductCard";
 import OrderModal from "../components/client/modal/OrderModal";
@@ -13,9 +13,16 @@ import MainShopLayout from "@/components/layout/MainShopLayout";
 import CheckoutInfoModal from "../components/client/modal/CheckoutInfoModal";
 import PaymentSelectionModal from "../components/client/payment/PaymentSelectionModal";
 
-
 export default function MainShopPage() {
-  const { data: products, loading, error, refetch, setAll, setCategory , setBestSellers} = useProducts();
+  const {
+    data: products,
+    loading,
+    error,
+    setAll,
+    setCategory,
+    setBestSellers,
+  } = useProducts();
+
   const { addToCart, checkout } = useCart();
 
   const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
@@ -23,17 +30,18 @@ export default function MainShopPage() {
   const [showCheckoutInfo, setShowCheckoutInfo] = useState(false);
   const [showPayment, setShowPayment] = useState(false);
 
-
-  const hasInitSearch = useRef(false);
+  // const hasInitSearch = useRef(false);
 
   const handleSearch = useCallback((query: string) => {
-    if (!hasInitSearch.current) {
-      hasInitSearch.current = true;
-      if (!query) return; // prevent empty init call
+    const clean = query.trim();
+
+    if (!clean) {
+      setAll();
+      return;
     }
 
     setAll({
-      search: query || undefined,
+      search: clean,
       page: 1,
     });
   }, [setAll]);
@@ -59,11 +67,13 @@ export default function MainShopPage() {
 
   return (
       <MainShopLayout onSearch={handleSearch} onCategory={handleCategory}>
-        {error && <p className="text-xs text-red-400 mb-3">{error}</p>}
+        {error && (
+            <p className="text-xs text-red-400 mb-3">{error}</p>
+        )}
 
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(220px,220px))] gap-x-5 gap-y-7">
+        <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-4 sm:gap-5 lg:gap-6">
           {loading ? (
-              <p className="text-gray-400">Loading...</p>
+              <p className="text-gray-400 col-span-full">Loading...</p>
           ) : products.length > 0 ? (
               products.map((product) => (
                   <ProductCard
@@ -75,7 +85,9 @@ export default function MainShopPage() {
                   />
               ))
           ) : (
-              <p className="text-gray-400">No products found</p>
+              <p className="text-gray-400 col-span-full">
+                No products found
+              </p>
           )}
         </div>
 
@@ -100,6 +112,7 @@ export default function MainShopPage() {
             />
         )}
 
+        {/* CHECKOUT INFO */}
         {showCheckoutInfo && (
             <CheckoutInfoModal
                 onClose={() => setShowCheckoutInfo(false)}
@@ -110,6 +123,7 @@ export default function MainShopPage() {
             />
         )}
 
+        {/* PAYMENT */}
         {showPayment && (
             <PaymentSelectionModal
                 onClose={() => setShowPayment(false)}

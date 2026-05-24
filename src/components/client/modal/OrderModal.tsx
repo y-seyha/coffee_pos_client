@@ -104,11 +104,17 @@ const OrderModal = ({ product, onClose, onConfirm }: OrderModalProps) => {
           {/* HEADER (UNCHANGED UI) */}
           <div className="flex gap-4 items-center mb-8">
             <div className="w-28 h-28 bg-[#F7F7F7] rounded-2xl flex items-center justify-center">
-              <img
-                  src={product.images?.[0]?.url || ""}
-                  alt={product.name}
-                  className="w-20 h-20 object-contain"
-              />
+              {product.images?.[0]?.url ? (
+                  <img
+                      src={product.images[0].url}
+                      alt={product.name}
+                      className="w-20 h-20 object-contain"
+                  />
+              ) : (
+                  <div className="w-20 h-20 bg-gray-200 rounded-xl flex items-center justify-center text-xs text-gray-400">
+                    No image
+                  </div>
+              )}
             </div>
 
             <div className="ml-10 flex-1">

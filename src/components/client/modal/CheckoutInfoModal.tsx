@@ -41,18 +41,18 @@ const CheckoutInfoModal = ({ onNext, onClose }: Props) => {
                 {/* TITLE */}
                 <div className="mb-6">
                     <h2 className="text-2xl font-bold text-[#cd8c52]">
-                        Checkout Info
+                        ព័ត៌មានការបញ្ជាទិញ
                     </h2>
 
                     <p className="text-sm text-gray-400 mt-1">
-                        Complete order information before payment
+                        សូមបំពេញព័ត៌មានមុនពេលទូទាត់ប្រាក់
                     </p>
                 </div>
 
                 {/* ORDER TYPE */}
                 <div className="mb-5">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Order Type
+                        ប្រភេទការបញ្ជាទិញ
                     </label>
 
                     <div className="grid grid-cols-2 gap-3">
@@ -65,7 +65,7 @@ const CheckoutInfoModal = ({ onNext, onClose }: Props) => {
                                     : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                             }`}
                         >
-                            Dine In
+                            ញុំានៅហាង
                         </button>
 
                         <button
@@ -77,7 +77,7 @@ const CheckoutInfoModal = ({ onNext, onClose }: Props) => {
                                     : "bg-white text-gray-700 border-gray-200 hover:bg-gray-50"
                             }`}
                         >
-                            Takeaway
+                            វេចខ្ចប់
                         </button>
                     </div>
                 </div>
@@ -86,12 +86,12 @@ const CheckoutInfoModal = ({ onNext, onClose }: Props) => {
                 {orderType === "DINEIN" && (
                     <div className="mb-5">
                         <label className="block text-sm font-semibold text-gray-700 mb-2">
-                            Table Number
+                            លេខតុ
                         </label>
 
                         <input
                             type="number"
-                            placeholder="Enter table number"
+                            placeholder="បញ្ចូលលេខតុ"
                             className="w-full rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-800 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#cd8c52]"
                             onChange={(e) => setTableId(Number(e.target.value))}
                         />
@@ -101,12 +101,12 @@ const CheckoutInfoModal = ({ onNext, onClose }: Props) => {
                 {/* NOTES */}
                 <div className="mb-6">
                     <label className="block text-sm font-semibold text-gray-700 mb-2">
-                        Notes
+                        កំណត់ចំណាំ
                     </label>
 
                     <textarea
                         rows={4}
-                        placeholder="Special request or order note..."
+                        placeholder="សំណើពិសេស ឬកំណត់ចំណាំ..."
                         value={notes}
                         onChange={(e) => setNotes(e.target.value)}
                         className="w-full resize-none rounded-2xl border border-gray-200 bg-white px-4 py-3 text-gray-800 placeholder:text-gray-400 outline-none focus:ring-2 focus:ring-[#cd8c52]"
@@ -119,16 +119,17 @@ const CheckoutInfoModal = ({ onNext, onClose }: Props) => {
                         onClick={onClose}
                         className="flex-1 py-3 rounded-2xl border border-gray-200 text-gray-600 font-semibold hover:bg-gray-50 transition"
                     >
-                        Cancel
+                        បោះបង់
                     </button>
 
                     <button
                         onClick={handleContinue}
                         className="flex-1 py-3 rounded-2xl bg-[#7487ff] text-white font-bold shadow-lg shadow-blue-100 hover:opacity-90 transition"
                     >
-                        Continue
+                        បន្ត
                     </button>
                 </div>
+
             </div>
         </div>
     );

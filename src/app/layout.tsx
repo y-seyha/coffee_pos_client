@@ -3,8 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { CartProvider } from "@/context/CartContext";
 import { AuthProvider } from "@/context/AuthContext";
-import {Toaster} from "sonner";
-
+import { Toaster } from "sonner";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -22,25 +21,23 @@ export const metadata: Metadata = {
 };
 
 export default function RootLayout({
-  children,
-}: Readonly<{
+                                     children,
+                                   }: {
   children: React.ReactNode;
-}>) {
+}) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
-        {" "}
-        <AuthProvider>
-          <CartProvider>
-            <main>{children}</main>
-
-            <Toaster position="bottom-right" />
-          </CartProvider>
-        </AuthProvider>
+      <html
+          lang="en"
+          className={`${geistSans.variable} ${geistMono.variable} h-dvh antialiased`}
+      >
+      <body className="h-dvh overflow-hidden">
+      <AuthProvider>
+        <CartProvider>
+          {children}
+          <Toaster position="bottom-right" />
+        </CartProvider>
+      </AuthProvider>
       </body>
-    </html>
+      </html>
   );
 }
