@@ -282,9 +282,21 @@ export function SidebarContent() {
 
             </ScrollArea>
 
-            {/* LOGOUT */}
-            <div className="border-t p-3">
+            {/* FOOTER ACTIONS */}
+            <div className="border-t p-3 space-y-2">
 
+                {/* BACK TO MAIN SITE */}
+                <Link href="/">
+                    <Button
+                        variant="outline"
+                        className="w-full flex items-center justify-center gap-2"
+                    >
+                        <LayoutDashboard className="h-4 w-4" />
+                        Back to Home
+                    </Button>
+                </Link>
+
+                {/* LOGOUT */}
                 <Button
                     variant="destructive"
                     className="w-full flex items-center justify-center gap-2"

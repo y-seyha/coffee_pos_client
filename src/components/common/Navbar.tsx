@@ -105,14 +105,26 @@ const Navbar = ({ onSearch }: NavbarProps) => {
                     <button
                         onClick={() => router.push("/admin")}
                         className="
-                            px-3 sm:px-4 py-1.5 sm:py-2
-                            text-xs sm:text-sm font-semibold
-                            rounded-full bg-[#D5904B]  text-white
-                            whitespace-nowrap
-                        "
+        group relative inline-flex items-center gap-2
+        px-4 sm:px-5 py-2 sm:py-2.5
+        rounded-full
+        bg-gradient-to-r from-[#D5904B] to-[#c77f3f]
+        text-white text-xs sm:text-sm font-semibold
+        shadow-md hover:shadow-lg
+        transition-all duration-200
+        active:scale-95
+        hover:brightness-110
+        whitespace-nowrap
+        overflow-hidden
+    "
                     >
-                        <span className="hidden sm:inline">Admin Dashboard</span>
-                        <span className="sm:hidden">Dashboard</span>
+                        {/* subtle shine effect */}
+                        <span className="absolute inset-0 opacity-0 group-hover:opacity-20 bg-white transition" />
+
+                        <span className="relative">
+        <span className="hidden sm:inline">Admin Dashboard</span>
+        <span className="sm:hidden">Dashboard</span>
+    </span>
                     </button>
                 )}
 
