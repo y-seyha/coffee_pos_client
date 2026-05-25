@@ -49,7 +49,7 @@ const Navbar = ({ onSearch }: NavbarProps) => {
         onSearch?.("");
     };
 
-    const isAdmin = user?.role === "ADMIN";
+    const isAdmin = user?.role?.id === 1;
 
     return (
         <nav className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white border-b border-gray-100 gap-3 sm:gap-6">
