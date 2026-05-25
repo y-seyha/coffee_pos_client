@@ -129,7 +129,32 @@ export default function VariantGroupPage() {
                 </AppTableHeader>
 
                 {loading ? (
-                    <div className="p-4 text-muted-foreground">Loading...</div>
+                    Array.from({ length: 5 }).map((_, i) => (
+                        <AppTableRow key={i} index={i}>
+                            <AppTableCell>
+                                <div className="h-4 w-10 bg-gray-200 rounded animate-pulse" />
+                            </AppTableCell>
+
+                            <AppTableCell>
+                                <div className="h-4 w-24 bg-gray-200 rounded animate-pulse" />
+                            </AppTableCell>
+
+                            <AppTableCell>
+                                <div className="h-4 w-20 bg-gray-200 rounded animate-pulse" />
+                            </AppTableCell>
+
+                            <AppTableCell>
+                                <div className="h-4 w-8 bg-gray-200 rounded animate-pulse" />
+                            </AppTableCell>
+
+                            <AppTableCell>
+                                <div className="flex gap-2">
+                                    <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
+                                    <div className="h-8 w-8 bg-gray-200 rounded animate-pulse" />
+                                </div>
+                            </AppTableCell>
+                        </AppTableRow>
+                    ))
                 ) : (
                     data.map((g, i) => (
                         <AppTableRow key={g.id} index={i}>

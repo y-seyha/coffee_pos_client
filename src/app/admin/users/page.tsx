@@ -21,7 +21,7 @@ import {
     Plus,
     Power,
     Pencil,
-    Trash2, KeyRound,
+    Trash2, KeyRound, EyeOff, Eye,
 } from "lucide-react";
 import { AppTable } from "@/components/dashboard/AppTable";
 import { AppTableHeader } from "@/components/dashboard/AppTableHeader";
@@ -74,10 +74,33 @@ export default function UserManagementPage() {
     const [confirmType, setConfirmType] = useState<"delete" | "role" | "password" | null>(null);
     const [detailModalOpen, setDetailModalOpen] = useState(false);
     const [detailUser, setDetailUser] = useState<User | null>(null);
-
     const POSITION_OPTIONS = ["Cashier", "Barista", "Manager"] as const;
-
     type Position = (typeof POSITION_OPTIONS)[number];
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    const passwordsMatch =
+        passwordForm.password &&
+        passwordForm.confirmPassword &&
+        passwordForm.password === passwordForm.confirmPassword;
+
+    const TableSkeleton = () => (
+        <>
+            {Array.from({ length: 6 }).map((_, i) => (
+                <div
+                    key={i}
+                    className="grid grid-cols-9 gap-3 p-3 border-b animate-pulse"
+                >
+                    {Array.from({ length: 9 }).map((__, j) => (
+                        <div
+                            key={j}
+                            className="h-4 bg-gray-200 rounded w-full"
+                        />
+                    ))}
+                </div>
+            ))}
+        </>
+    );
 
     const fetchUsers = async () => {
         try {
@@ -203,52 +226,33 @@ export default function UserManagementPage() {
         }
     };
 
-    const handleDelete = async () => {
-        if (deleteId === null) return;
-
-        try {
-            setDeleteLoading(true);
-
-            await usersApi.remove(deleteId);
-
-            toast.success("User deleted successfully");
-
-            setConfirmOpen(false);
-            setDeleteId(null);
-
-            fetchUsers();
-
-        } catch (error: any) {
-            toast.error(error?.response?.data?.message || "Delete failed");
-        } finally {
-            setDeleteLoading(false);
-        }
-    };
-
     const handleConfirm = async () => {
-        if (!deleteId) return;
+        if (!deleteId || !confirmType) return;
 
         try {
             setDeleteLoading(true);
 
-            if (confirmType === "delete") {
-                await usersApi.remove(deleteId);
-                toast.success("User deleted");
+            switch (confirmType) {
+                case "delete":
+                    await usersApi.remove(deleteId);
+                    toast.success("User deleted");
+                    break;
+
+                case "role":
+                    await usersApi.changeRole(deleteId, newRoleId);
+                    toast.success("Role updated");
+                    break;
+
+                case "password":
+                    await usersApi.resetPassword(deleteId, {
+                        new_password: passwordForm.password,
+                    });
+                    toast.success("Password reset");
+                    break;
             }
 
-            if (confirmType === "role") {
-                await usersApi.changeRole(deleteId, newRoleId);
-                toast.success("Role updated");
-            }
+            await fetchUsers();
 
-            if (confirmType === "password") {
-                await usersApi.resetPassword(deleteId, {
-                    new_password: passwordForm.password,
-                });
-                toast.success("Password reset");
-            }
-
-            fetchUsers();
             setConfirmOpen(false);
             setConfirmType(null);
             setDeleteId(null);
@@ -357,7 +361,7 @@ export default function UserManagementPage() {
                 </AppTableHeader>
 
                 {loading ? (
-                    <div className="p-10 text-center">Loading...</div>
+                    <TableSkeleton />
                 ) : users.length === 0 ? (
                     <div className="p-10 text-center">No users found</div>
                 ) : (
@@ -365,7 +369,9 @@ export default function UserManagementPage() {
                         <AppTableRow key={user.id} cols={9} index={user.id}>
 
                             {/* No */}
-                            <AppTableCell>{i + 1}</AppTableCell>
+                            <AppTableCell>
+                                {(page - 1) * 10 + i + 1}
+                            </AppTableCell>
 
                             {/* ID */}
                             <AppTableCell>
@@ -482,6 +488,7 @@ export default function UserManagementPage() {
                                         <DropdownMenuItem
                                             onClick={() => {
                                                 setDeleteId(user.id);
+                                                setConfirmType("delete");
                                                 setConfirmOpen(true);
                                             }}
                                             className="text-red-600"
@@ -716,9 +723,10 @@ export default function UserManagementPage() {
                                 return;
                             }
 
-                            setConfirmOpen(true);
+                            setDeleteId(selectedUser.id);
+                            setConfirmType("role");
                             setRoleModalOpen(false);
-                            setDeleteId(selectedUser.id); // reuse confirm modal pattern
+                            setConfirmOpen(true);
                         }}
                     >
                         Update Role
@@ -729,41 +737,147 @@ export default function UserManagementPage() {
 
             <AppModal
                 open={passwordModalOpen}
-                onClose={() => setPasswordModalOpen(false)}
+                onClose={() => {
+                    setPasswordModalOpen(false);
+
+                    setPasswordForm({
+                        password: "",
+                        confirmPassword: "",
+                    });
+
+                    setShowPassword(false);
+                    setShowConfirmPassword(false);
+                }}
                 title="Reset Password"
             >
-                <div className="space-y-3">
+                <div className="space-y-4">
 
-                    <Input
-                        type="password"
-                        placeholder="New password"
-                        value={passwordForm.password}
-                        onChange={(e) =>
-                            setPasswordForm({ ...passwordForm, password: e.target.value })
-                        }
-                    />
+                    {/* NEW PASSWORD */}
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium">
+                            New Password
+                        </label>
 
-                    <Input
-                        type="password"
-                        placeholder="Confirm password"
-                        value={passwordForm.confirmPassword}
-                        onChange={(e) =>
-                            setPasswordForm({ ...passwordForm, confirmPassword: e.target.value })
-                        }
-                    />
+                        <div className="relative">
+                            <Input
+                                type={showPassword ? "text" : "password"}
+                                placeholder="Enter new password"
+                                value={passwordForm.password}
+                                onChange={(e) =>
+                                    setPasswordForm({
+                                        ...passwordForm,
+                                        password: e.target.value,
+                                    })
+                                }
+                                className="pr-10"
+                            />
 
+                            <button
+                                type="button"
+                                onClick={() => setShowPassword(!showPassword)}
+                                className="
+                        absolute right-3 top-1/2 -translate-y-1/2
+                        text-muted-foreground hover:text-foreground
+                    "
+                            >
+                                {showPassword ? (
+                                    <EyeOff className="w-4 h-4" />
+                                ) : (
+                                    <Eye className="w-4 h-4" />
+                                )}
+                            </button>
+                        </div>
+                    </div>
+
+                    {/* CONFIRM PASSWORD */}
+                    <div className="space-y-1">
+                        <label className="text-sm font-medium">
+                            Confirm Password
+                        </label>
+
+                        <div className="relative">
+                            <Input
+                                type={showConfirmPassword ? "text" : "password"}
+                                placeholder="Confirm password"
+                                value={passwordForm.confirmPassword}
+                                onChange={(e) =>
+                                    setPasswordForm({
+                                        ...passwordForm,
+                                        confirmPassword: e.target.value,
+                                    })
+                                }
+                                className={`
+                        pr-10
+                        ${
+                                    passwordForm.confirmPassword
+                                        ? passwordsMatch
+                                            ? "border-green-500 focus-visible:ring-green-500"
+                                            : "border-red-500 focus-visible:ring-red-500"
+                                        : ""
+                                }
+                    `}
+                            />
+
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setShowConfirmPassword(!showConfirmPassword)
+                                }
+                                className="
+                        absolute right-3 top-1/2 -translate-y-1/2
+                        text-muted-foreground hover:text-foreground
+                    "
+                            >
+                                {showConfirmPassword ? (
+                                    <EyeOff className="w-4 h-4" />
+                                ) : (
+                                    <Eye className="w-4 h-4" />
+                                )}
+                            </button>
+                        </div>
+
+                        {/* PASSWORD MATCH STATUS */}
+                        {passwordForm.confirmPassword && (
+                            <p
+                                className={`text-xs ${
+                                    passwordsMatch
+                                        ? "text-green-600"
+                                        : "text-red-500"
+                                }`}
+                            >
+                                {passwordsMatch
+                                    ? "Passwords match"
+                                    : "Passwords do not match"}
+                            </p>
+                        )}
+                    </div>
+
+                    {/* BUTTON */}
                     <Button
                         className="w-full"
+                        disabled={
+                            !passwordForm.password ||
+                            !passwordForm.confirmPassword ||
+                            !passwordsMatch
+                        }
                         onClick={() => {
                             if (!selectedUser) return;
 
-                            if (passwordForm.password !== passwordForm.confirmPassword) {
+                            if (!passwordsMatch) {
                                 toast.error("Passwords do not match");
+                                return;
+                            }
+
+                            if (passwordForm.password.length < 6) {
+                                toast.error(
+                                    "Password must be at least 6 characters"
+                                );
                                 return;
                             }
 
                             setConfirmOpen(true);
                             setPasswordModalOpen(false);
+
                             setDeleteId(selectedUser.id);
                             setConfirmType("password");
                         }}
@@ -887,20 +1001,24 @@ export default function UserManagementPage() {
             {/* CONFIRM DELETE */}
             <ConfirmModal
                 open={confirmOpen}
-                onCancel={() => setConfirmOpen(false)}
-                onConfirm={handleDelete}
-                loading={deleteLoading}
-                title="Delete User"
-                description="This action cannot be undone."
-            />
-
-            <ConfirmModal
-                open={confirmOpen}
-                onCancel={() => setConfirmOpen(false)}
+                onCancel={() => {
+                    setConfirmOpen(false);
+                    setConfirmType(null);
+                }}
                 onConfirm={handleConfirm}
                 loading={deleteLoading}
-                title="Confirm Action"
-                description="Are you sure you want to continue?"
+                title={
+                    confirmType === "delete"
+                        ? "Delete User"
+                        : confirmType === "role"
+                            ? "Change Role"
+                            : "Reset Password"
+                }
+                description={
+                    confirmType === "delete"
+                        ? "This action cannot be undone."
+                        : "Are you sure you want to continue?"
+                }
             />
 
 

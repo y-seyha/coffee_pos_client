@@ -29,7 +29,17 @@ export const usersApi = {
         apiRequest("patch", `/users/${id}/reset-password`, data
         ),
 
-    changeRole: (id: number, roleId: number) =>
-        apiRequest("patch", `/users/${id}/role/${roleId}`
-        ),
+    changeRole: (id: number, roleId: number) => {
+        console.log("[changeRole REQUEST]", { id, roleId });
+
+        return apiRequest("patch", `/users/${id}/role/${roleId}`)
+            .then((res) => {
+                console.log("[changeRole RESPONSE]", res);
+                return res;
+            })
+            .catch((err) => {
+                console.log("[changeRole ERROR]", err?.response?.data || err);
+                throw err;
+            });
+    },
 };

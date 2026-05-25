@@ -45,13 +45,21 @@ export default function VariantOptionPage() {
 
     const [form, setForm] = useState(initialForm);
     const [sortBy, setSortBy] = useState<"type" | "active" | "sort">("sort");
+    const [loading, setLoading] = useState(false);
 
     const fetchData = async () => {
-        const res = await variantOptionApi.getAll();
-        setData(res.data);
+        setLoading(true);
+        try {
+            const res = await variantOptionApi.getAll();
+            setData(res.data);
 
-        const g = await variantGroupApi.getAll();
-        setGroups(g.data);
+            const g = await variantGroupApi.getAll();
+            setGroups(g.data);
+        } catch (err) {
+            toast.error("Failed to load data");
+        } finally {
+            setLoading(false);
+        }
     };
 
     useEffect(() => {
@@ -215,55 +223,64 @@ export default function VariantOptionPage() {
                     <div>Actions</div>
                 </AppTableHeader>
 
-                {sortedData.map((o, i) => (
-                    <AppTableRow key={o.id} index={i} cols={10}>
-                        <AppTableCell>{i + 1}</AppTableCell>
-                        <AppTableCell>{o.id}</AppTableCell>
-                        <AppTableCell>{o.name}</AppTableCell>
-                        <AppTableCell>{o.variant_group?.name}</AppTableCell>
-                        <AppTableCell>{o.price_adjustment}</AppTableCell>
+                {loading ? (
+                    Array.from({ length: 5 }).map((_, i) => (
+                        <AppTableRow key={i} index={i} cols={10}>
+                            {Array.from({ length: 10 }).map((_, j) => (
+                                <AppTableCell key={j}>
+                                    <div className="h-4 w-full bg-gray-200 rounded animate-pulse" />
+                                </AppTableCell>
+                            ))}
+                        </AppTableRow>
+                    ))
+                ) : (
+                    sortedData.map((o, i) => (
+                        <AppTableRow key={o.id} index={i} cols={10}>
+                            <AppTableCell>{i + 1}</AppTableCell>
+                            <AppTableCell>{o.id}</AppTableCell>
+                            <AppTableCell>{o.name}</AppTableCell>
+                            <AppTableCell>{o.variant_group?.name}</AppTableCell>
+                            <AppTableCell>{o.price_adjustment}</AppTableCell>
 
-                        {/* TYPE */}
-                        <AppTableCell>
-                            <span className={typeBadge(o.price_adjustment_type)}>
-                                {o.price_adjustment_type}
-                            </span>
-                        </AppTableCell>
+                            <AppTableCell>
+                <span className={typeBadge(o.price_adjustment_type)}>
+                    {o.price_adjustment_type}
+                </span>
+                            </AppTableCell>
 
-                        {/* DEFAULT */}
-                        <AppTableCell>
-                            <span className={yesNoBadge(o.is_default)}>
-                                {o.is_default ? "Yes" : "No"}
-                            </span>
-                        </AppTableCell>
+                            <AppTableCell>
+                <span className={yesNoBadge(o.is_default)}>
+                    {o.is_default ? "Yes" : "No"}
+                </span>
+                            </AppTableCell>
 
-                        {/* ACTIVE */}
-                        <AppTableCell>
-                            <span className={statusBadge(o.is_active)}>
-                                {o.is_active ? "Active" : "Inactive"}
-                            </span>
-                        </AppTableCell>
+                            <AppTableCell>
+                <span className={statusBadge(o.is_active)}>
+                    {o.is_active ? "Active" : "Inactive"}
+                </span>
+                            </AppTableCell>
 
-                        <AppTableCell>{o.sort_order}</AppTableCell>
+                            <AppTableCell>{o.sort_order}</AppTableCell>
 
-                        <AppTableCell>
-                            <div className="flex gap-2">
-                                <button onClick={() => openEdit(o)}>
-                                    <Pencil className="w-4 h-4 text-blue-500" />
-                                </button>
+                            <AppTableCell>
+                                <div className="flex gap-2">
+                                    <button onClick={() => openEdit(o)}>
+                                        <Pencil className="w-4 h-4 text-blue-500" />
+                                    </button>
 
-                                <button
-                                    onClick={() => {
-                                        setDeleteId(o.id);
-                                        setConfirmOpen(true);
-                                    }}
-                                >
-                                    <Trash2 className="w-4 h-4 text-red-500" />
-                                </button>
-                            </div>
-                        </AppTableCell>
-                    </AppTableRow>
-                ))}
+                                    <button
+                                        onClick={() => {
+                                            setDeleteId(o.id);
+                                            setConfirmOpen(true);
+                                        }}
+                                    >
+                                        <Trash2 className="w-4 h-4 text-red-500" />
+                                    </button>
+                                </div>
+                            </AppTableCell>
+                        </AppTableRow>
+                    ))
+                )}
             </AppTable>
 
             <AppModal

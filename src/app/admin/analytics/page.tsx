@@ -59,10 +59,16 @@ export default function AnalyticsPage() {
     }, [filter, report]);
 
     const topProductName = report?.top_products?.[0]?.name;
+
     if (loading) {
         return (
-            <div className="p-6 text-sm text-muted-foreground">
-                Loading analytics...
+            <div className="flex h-[60vh] w-full items-center justify-center">
+                <div className="flex flex-col items-center gap-3">
+                    <div className="h-10 w-10 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                    <p className="text-sm text-muted-foreground">
+                        Loading analytics...
+                    </p>
+                </div>
             </div>
         );
     }

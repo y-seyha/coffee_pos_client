@@ -10,7 +10,7 @@ import { ReactNode } from "react";
 
 type AppModalProps = {
     open: boolean;
-    title: string;
+    title?: string;
     children: ReactNode;
     onClose: () => void;
 };
@@ -21,7 +21,7 @@ export function AppModal({ open, title, children, onClose }: AppModalProps) {
             <DialogContent className="rounded-2xl w-full max-w-4xl">
                 <DialogHeader>
                     <DialogTitle className="text-lg font-semibold">
-                        {title}
+                        {title?.trim() ? title : "Dialog"}
                     </DialogTitle>
                 </DialogHeader>
 

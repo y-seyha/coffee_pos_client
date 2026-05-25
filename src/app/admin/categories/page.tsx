@@ -130,8 +130,13 @@ export default function CategoryPage() {
                 </AppTableHeader>
 
                 {loading ? (
-                    <div className="p-4 text-sm text-muted-foreground">
-                        Loading...
+                    <div className="col-span-full flex h-40 items-center justify-center">
+                        <div className="flex flex-col items-center gap-2">
+                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                            <p className="text-sm text-muted-foreground">
+                                Loading categories...
+                            </p>
+                        </div>
                     </div>
                 ) : (
                     data.map((c, i) => (

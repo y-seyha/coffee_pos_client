@@ -443,7 +443,11 @@ export type User = {
     created_at: string;
     updated_at: string;
     last_login_at?: string;
-    role: "ADMIN" | "MANAGER" | "CASHIER";
+    role: {
+        id: number;
+        name: string;
+        description?: string;
+    } | null;
     staffProfile?: {
         employee_code?: string;
         position?: string;
@@ -471,3 +475,12 @@ export enum Position {
     BARISTA = "Barista",
     MANAGER = "Manager",
 }
+
+
+export type UserUI = Omit<User, "role"> & {
+    role: {
+        id: number;
+        name: string;
+        description?: string;
+    } | null;
+};

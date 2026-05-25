@@ -19,7 +19,6 @@ import {
     Eye,
     CheckCircle,
     XCircle,
-    Banknote,
     Check,
 } from "lucide-react";
 
