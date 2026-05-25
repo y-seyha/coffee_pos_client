@@ -9,13 +9,19 @@ type NavbarProps = {
     onSearch?: (query: string) => void;
 };
 
+type IUser = {
+    id: number;
+    email: string;
+    role: string;
+};
+
 const Navbar = ({ onSearch }: NavbarProps) => {
     const [query, setQuery] = useState("");
     const [loading, setLoading] = useState(false);
 
     const lastSentRef = useRef("");
 
-    const { user } = useAuth();
+    const { user } = useAuth() as { user: IUser | null };
     const router = useRouter();
 
     useEffect(() => {
@@ -49,7 +55,8 @@ const Navbar = ({ onSearch }: NavbarProps) => {
         onSearch?.("");
     };
 
-    const isAdmin = user?.role?.id === 1;
+    const isAdmin = user?.role=== "ADMIN";
+
 
     return (
         <nav className="flex items-center justify-between px-4 sm:px-6 lg:px-8 py-3 sm:py-4 bg-white border-b border-gray-100 gap-3 sm:gap-6">
