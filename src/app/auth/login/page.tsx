@@ -117,12 +117,12 @@ const LoginPage = () => {
                   លេខសម្ងាត់
                 </label>
 
-                <a
-                  href="#"
-                  className="text-[13px] font-bold text-[#cd8c52] hover:opacity-80 transition-opacity"
-                >
-                  ភ្លេចលេខសម្ងាត់?
-                </a>
+                {/*<a*/}
+                {/*  href="#"*/}
+                {/*  className="text-[13px] font-bold text-[#cd8c52] hover:opacity-80 transition-opacity"*/}
+                {/*>*/}
+                {/*  ភ្លេចលេខសម្ងាត់?*/}
+                {/*</a>*/}
               </div>
 
               <div className="relative">

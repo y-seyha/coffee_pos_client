@@ -19,22 +19,42 @@ export function getApiClient(): AxiosInstance {
         return config;
     });
 
-    let isRedirecting = false;
+    let isRefreshing = false;
+    let failedQueue: any[] = [];
 
     apiClient.interceptors.response.use(
         (response) => response,
-        (error: AxiosError<any>) => {
+        async (error: AxiosError<any>) => {
             const status = error.response?.status;
+            const originalRequest: any = error.config;
 
             const isLoginPage = window.location.pathname === "/auth/login";
 
-            if (status === 401) {
-                console.warn("Unauthorized");
+            if (status === 401 && !originalRequest._retry && !isLoginPage) {
+                originalRequest._retry = true;
 
-                if (!isRedirecting && !isLoginPage) {
-                    isRedirecting = true;
+                if (isRefreshing) {
+                    return new Promise((resolve) => {
+                        failedQueue.push(() => {
+                            resolve(apiClient!(originalRequest));
+                        });
+                    });
+                }
 
+                isRefreshing = true;
+
+                try {
+                    await apiClient!.post("/auth/refresh");
+
+                    failedQueue.forEach((cb) => cb());
+                    failedQueue = [];
+
+                    return apiClient!(originalRequest);
+                } catch (refreshError) {
                     window.location.href = "/auth/login";
+                    return Promise.reject(refreshError);
+                } finally {
+                    isRefreshing = false;
                 }
             }
 

@@ -8,40 +8,53 @@ export const successToast = (
     toast.custom(
         (t: any) => (
             <div
-                className={`bg-white text-black rounded-xl shadow-lg overflow-hidden min-w-[260px] relative ${
-                    t.visible ? "animate-in fade-in" : "animate-out fade-out"
+                className={`relative w-[320px] rounded-2xl border border-green-100 bg-white shadow-xl overflow-hidden transition-all ${
+                    t.visible
+                        ? "animate-in fade-in slide-in-from-top-2"
+                        : "animate-out fade-out"
                 }`}
             >
-                {/* CLOSE */}
+                {/* HEADER GLOW */}
+                <div className="absolute top-0 left-0 h-1 w-full bg-gradient-to-r from-green-400 via-emerald-500 to-green-600" />
+
+                {/* CLOSE BUTTON */}
                 <button
                     onClick={() => toast.dismiss(t.id)}
-                    className="absolute top-2 right-2 text-gray-400 hover:text-black"
+                    className="absolute top-2 right-2 rounded-md p-1 text-gray-400 hover:bg-gray-100 hover:text-gray-700 transition"
                 >
                     ✕
                 </button>
 
                 {/* CONTENT */}
-                <div className="flex items-start gap-2 px-4 py-3 pr-8">
-                    {/* ICON (keep green) */}
-                    <div className="text-green-500 mt-0.5 font-bold">✔</div>
+                <div className="flex gap-3 px-4 py-4 pr-10">
+                    {/* ICON BADGE */}
+                    <div className="flex h-9 w-9 items-center justify-center rounded-full bg-green-100 text-green-600 shadow-sm">
+                        ✓
+                    </div>
 
-                    <div>
-                        <div className="font-semibold text-black">{title}</div>
+                    <div className="flex-1">
+                        <div className="text-sm font-semibold text-gray-900">
+                            {title}
+                        </div>
 
                         {desc && (
-                            <div className="text-sm text-gray-600">{desc}</div>
+                            <div className="mt-1 text-xs leading-relaxed text-gray-500">
+                                {desc}
+                            </div>
                         )}
                     </div>
                 </div>
 
                 {/* PROGRESS BAR */}
-                <div
-                    className="absolute bottom-0 left-0 h-[3px] bg-green-500"
-                    style={{
-                        width: "100%",
-                        animation: `toastProgress ${duration}ms linear forwards`,
-                    }}
-                />
+                <div className="absolute bottom-0 left-0 h-[3px] w-full bg-green-50">
+                    <div
+                        className="h-full bg-green-500"
+                        style={{
+                            width: "100%",
+                            animation: `toastProgress ${duration}ms linear forwards`,
+                        }}
+                    />
+                </div>
             </div>
         ),
         { duration }

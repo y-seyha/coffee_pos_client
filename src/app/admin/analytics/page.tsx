@@ -246,7 +246,7 @@ export default function AnalyticsPage() {
                 </div>
 
                 {/* Quick Insights */}
-                <div className="flex-1">
+                <div className="flex-1 mb-20">
                     <QuickInsights
                         topProduct={topProductName}
                         orderStats={{

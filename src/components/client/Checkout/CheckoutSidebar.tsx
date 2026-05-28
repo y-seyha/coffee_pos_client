@@ -67,7 +67,7 @@ const CartItem = ({ item }: any) => {
                         <button
                             onClick={() => decreaseQty(item.id)}
                             disabled={item.quantity <= 1}
-                            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[#8B5E3C]"
+                            className="w-6 h-6 sm:w-7 sm:h-7 rounded-full flex items-center justify-center text-[#8B5E3C] "
                         >
                             -
                         </button>
@@ -88,7 +88,7 @@ const CartItem = ({ item }: any) => {
 
                 <button
                     onClick={() => removeItem(item.id)}
-                    className="mt-2 text-xs text-red-400 flex items-center gap-1"
+                    className="mt-2 text-xs text-red-400 flex items-center gap-1 cursor-pointer"
                 >
                     <Trash2 size={12} />
                     Remove
@@ -246,6 +246,7 @@ const CheckoutSidebar = ({
 
             {showQRModal && (
                 <QRPaymentModal
+                    order={completedOrder!.order}
                     onClose={() => setShowQRModal(false)}
                     onPaymentSuccess={handleQRSuccess}
                 />

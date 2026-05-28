@@ -27,6 +27,14 @@ import {variantGroupApi} from "@/lib/api/variant-management.api";
 import {discountApi} from "@/lib/api/discount.api";
 import {SalesPieChart} from "@/components/dashboard/product/SalesPieChart";
 
+type ProductMeta = {
+    total: number;
+    page: number;
+    lastPage: number;
+    active?: number;
+    inactive?: number;
+};
+
 export default function ProductDashboardPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [bestSellers, setBestSellers] = useState<Product[]>([]);
@@ -51,10 +59,12 @@ export default function ProductDashboardPage() {
     const [discounts, setDiscounts] = useState<Discount[]>([]);
     const [variantGroups, setVariantGroups] = useState<VariantGroup[]>([]);
     const [categoryId, setCategoryId] = useState<number | undefined>();
-    const [meta, setMeta] = useState({
+    const [meta, setMeta] = useState<ProductMeta>({
         total: 0,
         page: 1,
         lastPage: 1,
+        active: 0,
+        inactive: 0,
     });
 
     const [form, setForm] = useState({
@@ -97,15 +107,17 @@ export default function ProductDashboardPage() {
         }
     };
 
-    const totalProducts = products.length;
+    const totalProducts = meta.total;
+    const activeProducts = meta.active;
+    const inactiveProducts = meta.inactive;
 
-    const activeProducts = useMemo(() => {
-        return products.filter((p) => p.is_available).length;
-    }, [products]);
-
-    const inactiveProducts = useMemo(() => {
-        return products.filter((p) => !p.is_available).length;
-    }, [products]);
+    // const activeProducts = useMemo(() => {
+    //     return products.filter((p) => p.is_available).length;
+    // }, [products]);
+    //
+    // const inactiveProducts = useMemo(() => {
+    //     return products.filter((p) => !p.is_available).length;
+    // }, [products]);
 
     const openCreate = () => {
         setEditItem(null);

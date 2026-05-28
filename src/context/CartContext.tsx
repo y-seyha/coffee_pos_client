@@ -9,6 +9,7 @@ import React, {
 
 import { apiRequest } from "@/helper/api.helper";
 import { CartItem, CartResponse, CartSummary, CheckoutApiResponse } from "@/types";
+import {toast} from "sonner";
 
 type CheckoutInfo = {
   order_type: "DINEIN" | "TAKEAWAY";
@@ -81,6 +82,9 @@ export const CartProvider = ({
       variant_option_id: number;
     }[];
   }) => {
+    const loadingToast = toast.loading("Adding to cart...", {
+      position: "top-right",
+    });
     try {
       await apiRequest("post", "/cart/addToCart", {
         product_id: Number(payload.product_id),
@@ -89,8 +93,16 @@ export const CartProvider = ({
       });
 
       await refreshCart();
+      toast.success("Added to cart ", {
+        id: loadingToast,
+        position: "top-right",
+      });
     } catch (err) {
       console.error("addToCart failed:", err);
+      toast.error("Failed to add item to cart", {
+        id: loadingToast,
+        position: "top-right",
+      });
     }
   };
 
@@ -125,26 +137,52 @@ export const CartProvider = ({
   };
 
   const removeItem = async (itemId: number) => {
+    const loadingToast = toast.loading("Removing item...", { position: "top-right" });
+
     try {
       await apiRequest("delete", `/cart/items/${itemId}`);
       await refreshCart();
+
+      toast.success("Item removed from cart", {
+        id: loadingToast,
+        position: "top-right",
+      });
     } catch (err) {
       console.error("removeItem failed:", err);
+
+      toast.error("Failed to remove item", {
+        id: loadingToast,
+        position: "top-right",
+      });
     }
   };
 
   const clearCart = async () => {
+    const loadingToast = toast.loading("Clearing cart..." , { position: "top-right" });
+
     try {
       await apiRequest("delete", "/cart/clear");
       await refreshCart();
+
+      toast.success("Cart cleared successfully", {
+        id: loadingToast,
+        position: "top-right",
+      });
     } catch (err) {
       console.error("clearCart failed:", err);
+
+      toast.error("Failed to clear cart", {
+        id: loadingToast,
+        position: "top-right",
+      });
     }
   };
 
   const checkout = async (
       payment_method: "CASH" | "KHQR"
   ): Promise<CheckoutApiResponse> => {
+    const loadingToast = toast.loading("Processing checkout...", { position: "top-right" }) ;
+
     try {
       if (!checkoutInfo) {
         throw new Error("Missing checkout info (order_type, table_id, notes)");
@@ -164,9 +202,20 @@ export const CartProvider = ({
       await refreshCart();
       setCheckoutInfo(null);
 
+      toast.success("Order placed successfully ", {
+        id: loadingToast,
+        position: "top-right",
+      });
+
       return res;
     } catch (err) {
       console.error("checkout failed:", err);
+
+      toast.error("Checkout failed. Please try again.", {
+        id: loadingToast,
+        position: "top-right",
+      });
+
       throw err;
     }
   };
