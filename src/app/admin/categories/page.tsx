@@ -119,69 +119,72 @@ export default function CategoryPage() {
                 </Button>
             </div>
 
-            {/* TABLE */}
-            <AppTable>
-                <AppTableHeader>
-                    <div>ID</div>
-                    <div>Name</div>
-                    <div>Products</div>
-                    <div>Status</div>
-                    <div>Actions</div>
-                </AppTableHeader>
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[800px]">
+                    <AppTable>
+                        <AppTableHeader>
+                            <div>ID</div>
+                            <div>Name</div>
+                            <div>Products</div>
+                            <div>Status</div>
+                            <div>Actions</div>
+                        </AppTableHeader>
 
-                {loading ? (
-                    <div className="col-span-full flex h-40 items-center justify-center">
-                        <div className="flex flex-col items-center gap-2">
-                            <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
-                            <p className="text-sm text-muted-foreground">
-                                Loading categories...
-                            </p>
-                        </div>
-                    </div>
-                ) : (
-                    data.map((c, i) => (
-                        <AppTableRow key={c.id} index={i}>
-                            <AppTableCell>{c.id}</AppTableCell>
-                            <AppTableCell>{c.name}</AppTableCell>
-                            <AppTableCell>
-                                {c.products?.length ?? 0}
-                            </AppTableCell>
-                            <AppTableCell>
-                                <span className="text-green-600">Active</span>
-                            </AppTableCell>
-
-                            <AppTableCell>
-                                <div className="flex gap-2 items-center">
-
-                                    {/* EDIT */}
-                                    <button
-                                        onClick={() => {
-                                            setEditItem(c);
-                                            setName(c.name);
-                                            setOpenModal(true);
-                                        }}
-                                        className="p-2 rounded-md hover:bg-muted transition"
-                                    >
-                                        <Pencil className="w-4 h-4 text-blue-500" />
-                                    </button>
-
-                                    {/* DELETE */}
-                                    <button
-                                        onClick={() => {
-                                            setDeleteId(c.id);
-                                            setConfirmOpen(true);
-                                        }}
-                                        className="p-2 rounded-md hover:bg-muted transition"
-                                    >
-                                        <Trash2 className="w-4 h-4 text-red-500" />
-                                    </button>
-
+                        {loading ? (
+                            <div className="col-span-full flex h-40 items-center justify-center">
+                                <div className="flex flex-col items-center gap-2">
+                                    <div className="h-8 w-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
+                                    <p className="text-sm text-muted-foreground">
+                                        Loading categories...
+                                    </p>
                                 </div>
-                            </AppTableCell>
-                        </AppTableRow>
-                    ))
-                )}
-            </AppTable>
+                            </div>
+                        ) : (
+                            data.map((c, i) => (
+                                <AppTableRow key={c.id} index={i}>
+                                    <AppTableCell>{c.id}</AppTableCell>
+                                    <AppTableCell>{c.name}</AppTableCell>
+                                    <AppTableCell>
+                                        {c.products?.length ?? 0}
+                                    </AppTableCell>
+                                    <AppTableCell>
+                                        <span className="text-green-600">Active</span>
+                                    </AppTableCell>
+
+                                    <AppTableCell>
+                                        <div className="flex gap-2 items-center">
+
+                                            {/* EDIT */}
+                                            <button
+                                                onClick={() => {
+                                                    setEditItem(c);
+                                                    setName(c.name);
+                                                    setOpenModal(true);
+                                                }}
+                                                className="p-2 rounded-md hover:bg-muted transition"
+                                            >
+                                                <Pencil className="w-4 h-4 text-blue-500" />
+                                            </button>
+
+                                            {/* DELETE */}
+                                            <button
+                                                onClick={() => {
+                                                    setDeleteId(c.id);
+                                                    setConfirmOpen(true);
+                                                }}
+                                                className="p-2 rounded-md hover:bg-muted transition"
+                                            >
+                                                <Trash2 className="w-4 h-4 text-red-500" />
+                                            </button>
+
+                                        </div>
+                                    </AppTableCell>
+                                </AppTableRow>
+                            ))
+                        )}
+                    </AppTable>
+                </div>
+            </div>
 
             <AppModal
                 open={openModal}

@@ -207,6 +207,8 @@ export default function DiscountDashboardPage() {
             </div>
 
             {/* TABLE */}
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[800px]">
             <AppTable>
 
                 <AppTableHeader cols={7}>
@@ -305,6 +307,8 @@ export default function DiscountDashboardPage() {
                     ))
                 )}
             </AppTable>
+                </div>
+            </div>
 
             {/* MODAL */}
             <AppModal

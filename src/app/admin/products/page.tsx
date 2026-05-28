@@ -414,97 +414,106 @@ export default function ProductDashboardPage() {
             </div>
 
             {/* TABLE */}
-            <AppTable>
-                {/* HEADER */}
-                <AppTableHeader cols={12}>
-                    <div>No.</div>
-                    <div>ID</div>
-                    <div>Image</div>
-                    <div>Name</div>
-                    <div>SKU</div>
-                    <div>Category</div>
-                    <div>Price</div>
-                    <div>Final</div>
-                    <div>Discount</div>
-                    <div>Available</div>
-                    <div>Variants</div>
-                    <div>Actions</div>
-                </AppTableHeader>
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[800px]">
+                    <AppTable>
+                        {/* HEADER */}
+                        <AppTableHeader cols={12}>
+                            <div>No.</div>
+                            <div>ID</div>
+                            <div>Image</div>
+                            <div>Name</div>
+                            <div>SKU</div>
+                            <div>Category</div>
+                            <div>Price</div>
+                            <div>Final</div>
+                            <div>Discount</div>
+                            <div>Available</div>
+                            <div>Variants</div>
+                            <div>Actions</div>
+                        </AppTableHeader>
 
-                {/* ROWS */}
-                {products.map((p, i) => (
-                    <AppTableRow key={p.id} index={i} cols={12}>
+                        {/* ROWS */}
+                        {products.map((p, i) => (
+                            <AppTableRow key={p.id} index={i} cols={12}>
 
-                        {/* No. */}
-                        <AppTableCell>
-                <span className="text-muted-foreground">{i + 1}</span>
-                        </AppTableCell>
+                                {/* No. */}
+                                <AppTableCell>
+                                    <span className="text-muted-foreground">{i + 1}</span>
+                                </AppTableCell>
 
-                        {/* ID */}
-                        <AppTableCell>
-                <span className=" text-muted-foreground">#{p.id}</span>
-                        </AppTableCell>
+                                {/* ID */}
+                                <AppTableCell>
+                                    <span className=" text-muted-foreground">#{p.id}</span>
+                                </AppTableCell>
 
-                        {/* IMAGE */}
-                        <AppTableCell>
-                            {p.images?.[0]?.url ? (
-                                <img
-                                    src={p.images[0].url}
-                                    alt={p.name}
-                                    className="w-14 h-14 object-cover rounded-lg border"
-                                />
-                            ) : (
-                                <div className="w-14 h-14 bg-gray-100 rounded-lg" />
-                            )}
-                        </AppTableCell>
+                                {/* IMAGE */}
+                                <AppTableCell>
+                                    {p.images?.[0]?.url ? (
+                                        <img
+                                            src={p.images[0].url}
+                                            alt={p.name}
+                                            className="w-14 h-14 object-cover rounded-lg border"
+                                        />
+                                    ) : (
+                                        <div className="w-14 h-14 bg-gray-100 rounded-lg" />
+                                    )}
+                                </AppTableCell>
 
-                        {/* NAME */}
-                        <AppTableCell>
-                            <div>
-                                <p className="font-medium">{p.name}</p>
-                                <p className="text-xs text-muted-foreground">
-                                    {new Date(p.created_at!).toLocaleDateString()}
-                                </p>
-                            </div>
-                        </AppTableCell>
+                                {/* NAME */}
+                                <AppTableCell>
+                                    <div className="max-w-[200px]">
+                                        <p className="font-medium truncate">
+                                            {p.name}
+                                        </p>
 
-                        {/* SKU */}
-                        <AppTableCell>{p.sku}</AppTableCell>
+                                        <p className="text-xs text-muted-foreground">
+                                            {new Date(p.created_at!).toLocaleDateString()}
+                                        </p>
+                                    </div>
+                                </AppTableCell>
 
-                        {/* CATEGORY */}
-                        <AppTableCell>
-                            {p.category?.name}
-                        </AppTableCell>
+                                {/* SKU */}
+                                <AppTableCell>
+                                    <div className="max-w-[140px] truncate">
+                                        {p.sku}
+                                    </div>
+                                </AppTableCell>
 
-                        {/* PRICE */}
-                        <AppTableCell>
-                            ${Number(p.price).toFixed(2)}
-                        </AppTableCell>
+                                {/* CATEGORY */}
+                                <AppTableCell>
+                                    {p.category?.name}
+                                </AppTableCell>
 
-                        {/* FINAL PRICE */}
-                        <AppTableCell>
+                                {/* PRICE */}
+                                <AppTableCell>
+                                    ${Number(p.price).toFixed(2)}
+                                </AppTableCell>
+
+                                {/* FINAL PRICE */}
+                                <AppTableCell>
                 <span className="font-semibold text-green-600">
                     ${Number(p.final_price ?? 0).toFixed(2)}
                 </span>
-                        </AppTableCell>
+                                </AppTableCell>
 
-                        {/* DISCOUNT */}
-                        <AppTableCell>
-                            {p.discount ? (
-                                <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs">
+                                {/* DISCOUNT */}
+                                <AppTableCell>
+                                    {p.discount ? (
+                                        <span className="bg-orange-100 text-orange-700 px-2 py-1 rounded-full text-xs">
                         {p.discount.type === "PERCENTAGE"
                             ? `${p.discount.value}%`
                             : `$${p.discount.value}`}
                     </span>
-                            ) : (
-                                <span className="text-gray-400 text-xs">
+                                    ) : (
+                                        <span className="text-gray-400 text-xs">
                         No discount
                     </span>
-                            )}
-                        </AppTableCell>
+                                    )}
+                                </AppTableCell>
 
-                        {/* AVAILABLE */}
-                        <AppTableCell>
+                                {/* AVAILABLE */}
+                                <AppTableCell>
                 <span
                     className={
                         p.is_available
@@ -514,116 +523,119 @@ export default function ProductDashboardPage() {
                 >
                     {p.is_available ? "Yes" : "No"}
                 </span>
-                        </AppTableCell>
+                                </AppTableCell>
 
-                        {/* VARIANTS */}
-                        <AppTableCell>
+                                {/* VARIANTS */}
+                                <AppTableCell>
                 <span className="text-sm text-muted-foreground">
                     {p.variant_groups?.length ?? 0}
                 </span>
-                        </AppTableCell>
+                                </AppTableCell>
 
-                        {/* ACTIONS */}
-                        <AppTableCell>
-                            <DropdownMenu>
-                                <DropdownMenuTrigger asChild>
-                                    <Button variant="outline" size="sm">
-                                        <MoreHorizontal className="w-4 h-4" />
-                                    </Button>
-                                </DropdownMenuTrigger>
+                                {/* ACTIONS */}
+                                <AppTableCell>
+                                    <DropdownMenu>
+                                        <DropdownMenuTrigger asChild>
+                                            <Button variant="outline" size="sm">
+                                                <MoreHorizontal className="w-4 h-4" />
+                                            </Button>
+                                        </DropdownMenuTrigger>
 
-                                <DropdownMenuContent align="end" className="w-52">
+                                        <DropdownMenuContent align="end" className="w-52">
 
-                                    {/* EDIT */}
-                                    <DropdownMenuItem onClick={() => openEdit(p)}>
-                                        <Pencil className="w-4 h-4 mr-2 text-blue-500" />
-                                        Edit Product
-                                    </DropdownMenuItem>
+                                            {/* EDIT */}
+                                            <DropdownMenuItem onClick={() => openEdit(p)}>
+                                                <Pencil className="w-4 h-4 mr-2 text-blue-500" />
+                                                Edit Product
+                                            </DropdownMenuItem>
 
-                                    {/* DELETE */}
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            setDeleteId(p.id);
-                                            setConfirmOpen(true);
-                                        }}
-                                    >
-                                        <Trash2 className="w-4 h-4 mr-2 text-red-500" />
-                                        Delete Product
-                                    </DropdownMenuItem>
+                                            {/* DELETE */}
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setDeleteId(p.id);
+                                                    setConfirmOpen(true);
+                                                }}
+                                            >
+                                                <Trash2 className="w-4 h-4 mr-2 text-red-500" />
+                                                Delete Product
+                                            </DropdownMenuItem>
 
-                                    {/* DIVIDER */}
-                                    <div className="h-px bg-gray-100 my-1" />
+                                            {/* DIVIDER */}
+                                            <div className="h-px bg-gray-100 my-1" />
 
-                                    <DropdownMenuItem
-                                        onClick={async () => {
-                                            try {
-                                                await productApi.toggleAvailability(
-                                                    p.id,
-                                                    !p.is_available
-                                                );
+                                            <DropdownMenuItem
+                                                onClick={async () => {
+                                                    try {
+                                                        await productApi.toggleAvailability(
+                                                            p.id,
+                                                            !p.is_available
+                                                        );
 
-                                                toast.success(
-                                                    p.is_available
-                                                        ? "Product marked unavailable"
-                                                        : "Product marked available"
-                                                );
+                                                        toast.success(
+                                                            p.is_available
+                                                                ? "Product marked unavailable"
+                                                                : "Product marked available"
+                                                        );
 
-                                                fetchProducts();
-                                            } catch (err) {
-                                                toast.error("Failed to update availability");
-                                            }
-                                        }}
-                                    >
-                                        {p.is_available ? (
-                                            <ToggleRight className="w-4 h-4 mr-2 text-green-600" />
-                                        ) : (
-                                            <ToggleLeft className="w-4 h-4 mr-2 text-gray-500" />
-                                        )}
+                                                        fetchProducts();
+                                                    } catch (err) {
+                                                        toast.error("Failed to update availability");
+                                                    }
+                                                }}
+                                            >
+                                                {p.is_available ? (
+                                                    <ToggleRight className="w-4 h-4 mr-2 text-green-600" />
+                                                ) : (
+                                                    <ToggleLeft className="w-4 h-4 mr-2 text-gray-500" />
+                                                )}
 
-                                        {p.is_available ? "Mark Unavailable" : "Mark Available"}
-                                    </DropdownMenuItem>
+                                                {p.is_available ? "Mark Unavailable" : "Mark Available"}
+                                            </DropdownMenuItem>
 
-                                    {/* ASSIGN DISCOUNT */}
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            setSelectedProduct(p);
-                                            setDiscountModalOpen(true);
-                                        }}
-                                    >
-                                        <TicketPercent className="w-4 h-4 mr-2 text-green-600" />
-                                        Assign Discount
-                                    </DropdownMenuItem>
+                                            {/* ASSIGN DISCOUNT */}
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setSelectedProduct(p);
+                                                    setDiscountModalOpen(true);
+                                                }}
+                                            >
+                                                <TicketPercent className="w-4 h-4 mr-2 text-green-600" />
+                                                Assign Discount
+                                            </DropdownMenuItem>
 
-                                    {/* REMOVE DISCOUNT */}
-                                    <DropdownMenuItem
-                                        onClick={async () => {
-                                            await productApi.removeDiscount(p.id);
-                                            toast.success("Discount removed");
-                                            fetchProducts();
-                                        }}
-                                    >
-                                        <XCircle className="w-4 h-4 mr-2 text-orange-500" />
-                                        Remove Discount
-                                    </DropdownMenuItem>
+                                            {/* REMOVE DISCOUNT */}
+                                            <DropdownMenuItem
+                                                onClick={async () => {
+                                                    await productApi.removeDiscount(p.id);
+                                                    toast.success("Discount removed");
+                                                    fetchProducts();
+                                                }}
+                                            >
+                                                <XCircle className="w-4 h-4 mr-2 text-orange-500" />
+                                                Remove Discount
+                                            </DropdownMenuItem>
 
-                                    {/* ATTACH VARIANTS */}
-                                    <DropdownMenuItem
-                                        onClick={() => {
-                                            setSelectedProduct(p);
-                                            setVariantModalOpen(true);
-                                        }}
-                                    >
-                                        <Boxes className="w-4 h-4 mr-2 text-purple-500" />
-                                        Attach Variant Group
-                                    </DropdownMenuItem>
+                                            {/* ATTACH VARIANTS */}
+                                            <DropdownMenuItem
+                                                onClick={() => {
+                                                    setSelectedProduct(p);
+                                                    setVariantModalOpen(true);
+                                                }}
+                                            >
+                                                <Boxes className="w-4 h-4 mr-2 text-purple-500" />
+                                                Attach Variant Group
+                                            </DropdownMenuItem>
 
-                                </DropdownMenuContent>
-                            </DropdownMenu>
-                        </AppTableCell>
+                                        </DropdownMenuContent>
+                                    </DropdownMenu>
+                                </AppTableCell>
 
-                    </AppTableRow>
-                ))}
-            </AppTable>
+                            </AppTableRow>
+                        ))}
+                    </AppTable>
+
+                </div>
+            </div>
 
             {/* PAGINATION */}
             <div className="flex items-center justify-between pt-4">

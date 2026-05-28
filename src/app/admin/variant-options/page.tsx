@@ -209,6 +209,8 @@ export default function VariantOptionPage() {
             </div>
 
             {/* TABLE */}
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[800px]">
             <AppTable>
                 <AppTableHeader cols={10}>
                     <div>No.</div>
@@ -282,6 +284,8 @@ export default function VariantOptionPage() {
                     ))
                 )}
             </AppTable>
+                </div>
+            </div>
 
             <AppModal
                 open={open}

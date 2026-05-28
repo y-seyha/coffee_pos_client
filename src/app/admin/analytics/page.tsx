@@ -122,7 +122,7 @@ export default function AnalyticsPage() {
                     />
 
                     <StatCard
-                        title="Products"
+                        title="Top Products"
                         value={report?.top_products?.length ?? 0}
                         icon={Package}
                     />

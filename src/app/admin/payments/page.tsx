@@ -308,6 +308,8 @@ export default function PaymentsPage() {
             </div>
 
             {/* TABLE */}
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[800px]">
             <AppTable>
                 <AppTableHeader cols={7}>
                     <div>No.</div>
@@ -385,6 +387,8 @@ export default function PaymentsPage() {
                     </AppTableRow>
                 ))}
             </AppTable>
+                </div>
+            </div>
 
             {/* PAGINATION */}
             <div className="flex items-center justify-between gap-2">

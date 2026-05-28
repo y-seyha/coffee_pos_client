@@ -119,6 +119,8 @@ export default function VariantGroupPage() {
             </div>
 
             {/* TABLE */}
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[800px]">
             <AppTable>
                 <AppTableHeader>
                     <div>ID</div>
@@ -191,6 +193,8 @@ export default function VariantGroupPage() {
                     ))
                 )}
             </AppTable>
+                </div>
+            </div>
 
             {/* MODAL */}
             <AppModal

@@ -152,6 +152,8 @@ export default function OrderDashboardPage() {
             </div>
 
             {/* TABLE */}
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[1100px]">
             <AppTable>
                 <AppTableHeader cols={11}>
                     <div>No.</div>
@@ -328,6 +330,8 @@ export default function OrderDashboardPage() {
                     );
                 })}
             </AppTable>
+                </div>
+            </div>
 
             {/* PAGINATION */}
             <div className="flex justify-between items-center">

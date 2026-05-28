@@ -346,6 +346,8 @@ export default function UserManagementPage() {
             </div>
 
             {/* TABLE */}
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[1100px] ">
             <AppTable>
 
                 <AppTableHeader cols={9}>
@@ -389,7 +391,11 @@ export default function UserManagementPage() {
                             </AppTableCell>
 
                             {/* EMAIL */}
-                            <AppTableCell>{user.email}</AppTableCell>
+                            <AppTableCell >
+                                <div className="max-w-[220px] overflow-hidden text-ellipsis whitespace-nowrap">
+                                    {user.email}
+                                </div>
+                            </AppTableCell>
 
                             {/* ROLE */}
                             <AppTableCell>
@@ -506,6 +512,9 @@ export default function UserManagementPage() {
                 )}
 
             </AppTable>
+
+                </div>
+            </div>
 
             {/* MODAL */}
             <AppModal

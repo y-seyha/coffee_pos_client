@@ -203,6 +203,8 @@ export default function RoleManagementPage() {
             </div>
 
             {/* TABLE */}
+            <div className="w-full overflow-x-auto">
+                <div className="min-w-[1100px]">
             <AppTable>
                 <AppTableHeader cols={7}>
                     <div>No.</div>
@@ -341,7 +343,8 @@ export default function RoleManagementPage() {
                     ))
                 )}
             </AppTable>
-
+                </div>
+            </div>
             {/* CREATE / EDIT MODAL */}
             <AppModal
                 open={openModal}
