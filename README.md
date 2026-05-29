@@ -40,9 +40,9 @@ Use the following demo credentials:
 npm install
 ```
 
-### 3. Environment Variables
+### 3. 🔐 Environment Variables
 
-Create .env file in the root directory: (.env) (env already sent in telegram)
+Create .env file in the root directory: (.env) (**Environment variables are provided via Telegram (Yoeun Seyha)**).
 
 
 ### 4. Run the development server:
