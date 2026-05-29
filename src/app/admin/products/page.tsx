@@ -38,7 +38,10 @@ type ProductMeta = {
 export default function ProductDashboardPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [bestSellers, setBestSellers] = useState<Product[]>([]);
-    const [_loading, setLoading] = useState(false);
+    const [tableLoading, setTableLoading] = useState(false);
+
+    const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
     const [page, setPage] = useState(1);
     const [_openActionId, setOpenActionId] = useState<number | null>(null);
     const [search, setSearch] = useState("");
@@ -77,7 +80,7 @@ export default function ProductDashboardPage() {
 
     const fetchProducts = async () => {
         try {
-            setLoading(true);
+            setTableLoading(true);
 
             const res = await productApi.getAll({
                 page,
@@ -92,7 +95,7 @@ export default function ProductDashboardPage() {
         } catch (err) {
             toast.error("Failed to load products");
         } finally {
-            setLoading(false);
+            setTableLoading(false);
         }
     };
 
@@ -166,7 +169,10 @@ export default function ProductDashboardPage() {
 
     const handleSave = async () => {
         try {
+            setSaving(true);
+
             const formData = new FormData();
+
             formData.append("name", form.name);
             formData.append("sku", form.sku);
             formData.append("price", String(Number(form.price)));
@@ -178,38 +184,45 @@ export default function ProductDashboardPage() {
                     formData.append("files", file);
                 });
             }
+
             if (editItem) {
-                await productApi.update(
-                    editItem.id,
-                    formData
-                );
-                toast.success("product updated");
+                await productApi.update(editItem.id, formData);
+
+                toast.success("Product updated successfully");
             } else {
                 await productApi.create(formData);
-                toast.success("product created");
+
+                toast.success("Product created successfully");
             }
+
+            await fetchProducts();
 
             setOpen(false);
             setFiles(null);
-            fetchProducts();
-        } catch (err: any) {
-            toast.error("Save failed", {
-                description:
-                // err?.response?.data?.message,
-                "Cannot Save products"
-            });
+
+        } catch (err) {
+            toast.error("Failed to save product");
+        } finally {
+            setSaving(false);
         }
     };
 
     const handleDelete = async () => {
         if (!deleteId) return;
+
         try {
+            setDeleting(true);
+
             await productApi.delete(deleteId);
-            toast.success("product deleted");
-            fetchProducts();
+
+            toast.success("Product deleted");
+
+            await fetchProducts();
+
         } catch (err) {
             toast.error("Delete failed");
         } finally {
+            setDeleting(false);
             setDeleteId(null);
             setConfirmOpen(false);
         }
@@ -644,6 +657,21 @@ export default function ProductDashboardPage() {
 
                             </AppTableRow>
                         ))}
+
+                        {tableLoading ? (
+                            <div className="space-y-3">
+                                {Array.from({ length: 6 }).map((_, i) => (
+                                    <div
+                                        key={i}
+                                        className="h-16 rounded-xl bg-gray-100 animate-pulse"
+                                    />
+                                ))}
+                            </div>
+                        ) : (
+                            <div className="w-full overflow-x-auto">
+                                {/* TABLE */}
+                            </div>
+                        )}
                     </AppTable>
 
                 </div>
@@ -751,8 +779,18 @@ export default function ProductDashboardPage() {
                     </div>
 
                     {/* Submit */}
-                    <Button className="w-full" onClick={handleSave}>
-                        {editItem ? "Update product" : "Create product"}
+                    <Button
+                        className="w-full"
+                        onClick={handleSave}
+                        disabled={saving}
+                    >
+                        {saving
+                            ? editItem
+                                ? "Updating..."
+                                : "Creating..."
+                            : editItem
+                                ? "Update Product"
+                                : "Create Product"}
                     </Button>
                 </div>
             </AppModal>
@@ -762,6 +800,7 @@ export default function ProductDashboardPage() {
             <ConfirmModal
                 open={confirmOpen}
                 title="Delete Product?"
+                loading={deleting}
                 onCancel={() => setConfirmOpen(false)}
                 onConfirm={handleDelete}
             />
@@ -771,7 +810,8 @@ export default function ProductDashboardPage() {
                 title="Assign Discount"
                 onClose={() => setDiscountModalOpen(false)}
             >
-                <div className="space-y-3">
+                <div className="max-h-[70vh] overflow-y-auto space-y-3 pr-1">
+
                     {discounts.map((d) => {
                         const isActive = d.is_active;
 
@@ -850,8 +890,9 @@ export default function ProductDashboardPage() {
                     setSelectedVariantId(null);
                 }}
             >
-                <div className="space-y-4">
+                <div className="max-h-[70vh] overflow-y-auto space-y-4 pr-1">
 
+                    {/* SELECT */}
                     <select
                         className="w-full border rounded-xl p-3"
                         value={selectedVariantId ?? ""}
@@ -859,9 +900,7 @@ export default function ProductDashboardPage() {
                             setSelectedVariantId(Number(e.target.value))
                         }
                     >
-                        <option value="">
-                            Select Variant Group
-                        </option>
+                        <option value="">Select Variant Group</option>
 
                         {variantGroups.map((vg) => (
                             <option key={vg.id} value={vg.id}>
@@ -870,8 +909,9 @@ export default function ProductDashboardPage() {
                         ))}
                     </select>
 
+                    {/* BUTTON */}
                     <Button
-                        className="w-full"
+                        className="w-full sticky bottom-0"
                         disabled={!selectedVariantId}
                         onClick={async () => {
                             if (!selectedProduct || !selectedVariantId) return;
@@ -883,18 +923,22 @@ export default function ProductDashboardPage() {
                                         variant_group_id: selectedVariantId,
                                     }
                                 );
+
                                 toast.success("Variant group attached");
                                 fetchProducts();
                                 setVariantModalOpen(false);
                                 setSelectedVariantId(null);
 
                             } catch (err) {
-                                toast.error("Failed to attach variant group or variant group already attached");
+                                toast.error(
+                                    "Failed to attach variant group or variant group already attached"
+                                );
                             }
                         }}
                     >
                         Save Variant Group
                     </Button>
+
                 </div>
             </AppModal>
 

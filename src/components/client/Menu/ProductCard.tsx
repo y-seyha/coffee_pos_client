@@ -1,5 +1,7 @@
 "use client";
 
+import Image from "next/image";
+
 interface ProductCardProps {
     name: string;
     price: string;
@@ -12,15 +14,27 @@ const ProductCard = ({ name, price, image, onOrder }: ProductCardProps) => {
         <div className="bg-[#fcfcfc] p-3 sm:p-4 rounded-[24px] sm:rounded-[30px] border border-[#f1f1f1] hover:shadow-lg hover:-translate-y-1 transition-all duration-200 flex flex-col">
 
             {/* Image */}
-            <div className="bg-[#f7f7f7] rounded-[18px] sm:rounded-[24px] aspect-square flex items-center justify-center mb-3 sm:mb-5">
+            <div className="bg-[#f7f7f7] rounded-[18px] sm:rounded-[24px] aspect-square flex items-center justify-center mb-3 sm:mb-5 overflow-hidden group">
+
                 {image ? (
-                    <img
-                        src={image}
-                        alt={name}
-                        className="w-[70%] sm:w-[76%] h-[70%] sm:h-[76%] object-contain"
-                    />
+                    <div className="relative w-[75%] h-[75%]">
+                        <Image
+                            src={image}
+                            alt={name}
+                            fill
+                            sizes="(max-width: 640px) 140px, 220px"
+                            className="
+                    object-contain
+                    transition-transform
+                    duration-300
+                    group-hover:scale-105
+                "
+                        />
+                    </div>
                 ) : (
-                    <div className="text-xs sm:text-sm text-gray-400">No Image</div>
+                    <div className="text-xs sm:text-sm text-gray-400">
+                        No Image
+                    </div>
                 )}
             </div>
 
